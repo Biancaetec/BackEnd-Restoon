@@ -6,7 +6,7 @@ const PaymentSchema = z.object({
   total: z.number().positive(),
   numero: z.number().int().positive(),
   data: z.string().datetime(),
-  observacao: z.string().optional(),
+  observacao: z.string().optional(), 
 });
 
 const PaymentController = {
