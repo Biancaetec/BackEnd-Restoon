@@ -1,5 +1,5 @@
 import express from 'express';
-import HorariosFuncionamentoController from '../controllers/horariosfuncionamento.controller.js';
+import routesHorariosFuncionamento from './routes/horariosfuncionamento.routes.js';
 
 const router = express.Router();
 
