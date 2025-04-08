@@ -1,12 +1,13 @@
+// src/routes/horariosfuncionamento.routes.js
 import express from 'express';
-import routesHorariosFuncionamento from './routes/horariosfuncionamento.routes.js';
+import HorariosFuncionamentoController from '../controllers/horariosfuncionamento.controller.js'; 
 
 const router = express.Router();
 
-// Criar horariosfuncionamento
-router.post('/horariosfuncionamento', HorariosFuncionamentoController.createHorariosFuncionamento);
 
-// Atualizar horariosfuncionamento
-router.post('/horariosfuncionamento', HorariosFuncionamentoController.createHorariosFuncionamento);
+router.post('/', HorariosFuncionamentoController.createHorariosFuncionamento);
+
+
+router.put('/:id', HorariosFuncionamentoController.updateHorariosFuncionamento); 
 
 export default router;

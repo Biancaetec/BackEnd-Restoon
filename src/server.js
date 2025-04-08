@@ -11,7 +11,7 @@ import routerCategorias from './routes/categorias.routes.js';
 import routesBanner from './routes/banners.routes.js';
 import routesCarrinho from './routes/carrinho.routes.js';
 import routesEndereco from './routes/enderecos.routes.js';
-import routeshorariofuncionamento from './routes/horariofuncionamento.routes.js';
+import routesHorariosfuncionamento from './routes/horariosfuncionamento.routes.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -19,7 +19,7 @@ server.use(express.json());
 
 // Aplicando todas as rotas no servidor
 server.use("/api/payment", routerPayment);
-server.use("/api/itens-pedido", routerItensPedido);
+server.use("/api/itenspedido", routerItensPedido);
 server.use("/api/mercados", routerMercados);
 server.use("/api/pedidos", routerPedidos);
 server.use("/api/clientes", routerClientes);
@@ -28,7 +28,7 @@ server.use("/api/categorias", routerCategorias);
 server.use("/api/banners", routesBanner);
 server.use("/api/carrinho", routesCarrinho);
 server.use("/api/enderecos", routesEndereco);
-server.use("/api/horario-funcionamento", routeshorariofuncionamento);
+server.use("/api/horariosfuncionamento", routesHorariosfuncionamento);
 
 // Teste simples das rotas raiz
 server.get("/", (req, res) => {
