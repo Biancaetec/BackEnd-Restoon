@@ -8,27 +8,27 @@ import routerPedidos from './routes/pedidos.routes.js';
 import routerClientes from './routes/clientes.routes.js';
 import routerProdutos from './routes/produtos.routes.js';
 import routerCategorias from './routes/categorias.routes.js';
-import routesBanner from './routes/banners.routes.js';
-import routesCarrinho from './routes/carrinho.routes.js';
-import routesEndereco from './routes/enderecos.routes.js';
-import routesHorariosfuncionamento from './routes/horariosfuncionamento.routes.js';
+import routerBanner from './routes/banners.routes.js';
+import routerCarrinho from './routes/carrinho.routes.js';
+import routerEndereco from './routes/enderecos.routes.js';
+import routerHorariosfuncionamento from './routes/horariosfuncionamento.routes.js';
 
 const PORT = process.env.PORT || 3000;
 
 server.use(express.json());
 
 // Aplicando todas as rotas no servidor
-server.use("/api/payment", routerPayment);
-server.use("/api/itenspedido", routerItensPedido);
-server.use("/api/mercados", routerMercados);
-server.use("/api/pedidos", routerPedidos);
-server.use("/api/clientes", routerClientes);
-server.use("/api/produtos", routerProdutos);
-server.use("/api/categorias", routerCategorias);
-server.use("/api/banners", routesBanner);
-server.use("/api/carrinho", routesCarrinho);
-server.use("/api/enderecos", routesEndereco);
-server.use("/api/horariosfuncionamento", routesHorariosfuncionamento);
+server.use("/api", routerPayment);
+server.use("/api", routerItensPedido);
+server.use("/api", routerMercados);
+server.use("/api", routerPedidos);
+server.use("/api", routerClientes);
+server.use("/api", routerProdutos);
+server.use("/api", routerCategorias);
+server.use("/api", routerBanner);
+server.use("/api", routerCarrinho);
+server.use("/api", routerEndereco);
+server.use("/api", routerHorariosfuncionamento);
 
 // Teste simples das rotas raiz
 server.get("/", (req, res) => {

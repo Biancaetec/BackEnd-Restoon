@@ -5,8 +5,12 @@ const router = express.Router();
 
 // Criar Banner
 router.post('/banners', BannersController.createBanners);
+router.get('/banners', BannersController.createBanners);
+router.delete('/banners', BannersController.createBanners);
+router.patch('/banners', BannersController.createBanners);
+
 
 // Atualizar Banner
-router.post('/banners', BannersController.createBanners);
+// router.post('/banners', BannersController.createBanners);
 
-export default router;
+export default router; 

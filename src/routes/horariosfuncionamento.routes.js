@@ -5,9 +5,13 @@ import HorariosFuncionamentoController from '../controllers/horariosfuncionament
 const router = express.Router();
 
 
-router.post('/', HorariosFuncionamentoController.createHorariosFuncionamento);
+router.post('/horariosfuncionamento', HorariosFuncionamentoController.createHorariosFuncionamento);
+router.get('/horariosfuncionamento', HorariosFuncionamentoController.createHorariosFuncionamento);
+router.delete('/horariosfuncionamento', HorariosFuncionamentoController.createHorariosFuncionamento);
+router.patch('/horariosfuncionamento', HorariosFuncionamentoController.createHorariosFuncionamento);
 
 
-router.put('/:id', HorariosFuncionamentoController.updateHorariosFuncionamento); 
+
+// router.put('/:id', HorariosFuncionamentoController.updateHorariosFuncionamento); 
 
 export default router;
