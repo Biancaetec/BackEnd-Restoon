@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-
 const ItensPedidoSchema = z.object({
   pedido_id: z.number().int().positive(),
   produto_id: z.number().int().positive(),
