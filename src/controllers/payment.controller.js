@@ -45,7 +45,10 @@ const PaymentController = {
         { id: 4, valor: 400, numero: 210987, data: new Date(), observacao: "Pagamento 4" },
         { id: 5, valor: 500, numero: 345678, data: new Date(), observacao: "Pagamento 5" },
         { id: 6, valor: 600, numero: 876543, data: new Date(), observacao: "Pagamento 6" },
-        { id: 7, valor: 700, numero: 234567, data: new Date(), observacao: "Pagamento 7" }
+        { id: 7, valor: 700, numero: 234567, data: new Date(), observacao: "Pagamento 7" },
+        { id: 8, valor: 800, numero: 765432, data: new Date(), observacao: "Pagamento 8" },
+        { id: 9, valor: 900, numero: 345678, data: new Date(), observacao: "Pagamento 9" },
+        { id: 10, valor: 1000, numero: 987654, data: new Date(), observacao: "Pagamento 10" },
       ];
       res.status(200).json({ data, message: "Pagamentos criados com sucesso" });
     } catch (error) {
