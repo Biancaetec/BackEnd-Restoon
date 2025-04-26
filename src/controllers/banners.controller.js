@@ -3,7 +3,6 @@ const BannersSchema = z.object({
   imagem_uri: z.string().url(),               
   created_at: z.string().datetime(),          
 });
-
 const BannersController = {
   async createBanners(req, res) {
     try {

@@ -17,7 +17,6 @@ const PORT = process.env.PORT || 3000;
 
 server.use(express.json());
 
-// Aplicando todas as rotas no servidor
 server.use("/api", routerPayment);
 server.use("/api", routerItensPedido);
 server.use("/api", routerMercados);
