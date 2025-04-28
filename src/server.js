@@ -30,8 +30,12 @@ server.use("/api", routerEndereco);
 server.use("/api", routerHorariosfuncionamento);
 
 // Teste simples das rotas raiz
+// server.get("/", (req, res) => {
+//     res.send("GET World " + new Date());
+// });
+
 server.get("/", (req, res) => {
-    res.send("GET World " + new Date());
+    res.send("Primeira Rota do Backend - TCC");
 });
 
 server.post("/", (req, res) => {
