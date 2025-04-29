@@ -1,4 +1,5 @@
 import express from 'express';
+import rootRoutes from './routes/index.js'; // Importando as rotas do index.js
 const server = express();
 
 import routerPayment from './routes/payment.routes.js';
@@ -15,6 +16,8 @@ import routerHorariosfuncionamento from './routes/horariosfuncionamento.routes.j
 
 const PORT = process.env.PORT || 3000;
 
+server.use(express.urlencoded({ extended: true }));
+server.use("/", rootRoutes); // Usando as rotas do index.js
 server.use(express.json());
 
 server.use("/api", routerPayment);

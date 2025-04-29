@@ -1,0 +1,105 @@
+Table mercados {
+  id integer [primary key]
+  nome varchar
+  cnpj varchar [unique]
+  email varchar
+  telefone varchar
+  logradouro varchar
+  bairro varchar
+  cep varchar
+  numero varchar
+  senha varchar
+  created_at timestamp
+}
+
+Table clientes {
+  id integer [primary key]
+  username varchar
+  email varchar [unique]
+  senha varchar
+  created_at timestamp
+}
+
+Table produtos {
+  id integer [primary key]
+  nome varchar
+  descricao text
+  preco decimal
+  categoria_id integer
+  mercado_id integer
+  status varchar
+  created_at timestamp
+}
+
+Table categorias {
+  id integer [primary key]
+  nome varchar
+  created_at timestamp
+}
+
+Table pedidos {
+  id integer [primary key]
+  cliente_id integer
+  mercado_id integer
+  status varchar
+  total decimal
+  created_at timestamp
+}
+
+Table enderecos {
+  id integer [primary key]
+  cliente_id integer [ref: > clientes.id, note: 'Pode ser NULL se for endereço de mercado']
+  mercado_id integer [ref: > mercados.id, note: 'Pode ser NULL se for endereço de cliente']
+  rua varchar [not null]
+  bairro varchar [not null]
+  cep varchar [not null]
+  numero varchar [not null]
+  complemento varchar
+  created_at timestamp
+}
+
+Table itens_pedido {
+  id integer [primary key]
+  pedido_id integer
+  produto_id integer
+  quantidade integer
+  subtotal decimal
+}
+
+Table banners {
+  id integer [primary key]
+  mercado_id integer
+  imagem_url varchar
+  created_at timestamp
+}
+
+Table horarios_funcionamento {
+  id integer [primary key]
+  mercado_id integer [not null, ref: > mercados.id]
+  dia_semana varchar(20) [not null] // Ex: 'Segunda-feira', 'Terça-feira'...
+  horario_abertura time [not null]
+  horario_fechamento time [not null]
+  data_feriado date // Caso seja um feriado específico
+  created_at timestamp
+  Note: "Tabela para armazenar horários de funcionamento dos mercados."
+}
+
+Table formas_pagamento {
+  id integer [primary key]
+  nome varchar [not null, unique]
+  descricao text
+}
+
+Table mercado_formas_pagamento {
+  id integer [primary key]
+  mercado_id integer [ref: > mercados.id]
+  forma_pagamento_id integer [ref: > formas_pagamento.id]
+}
+
+Ref: produtos.categoria_id > categorias.id
+Ref: produtos.mercado_id > mercados.id
+Ref: pedidos.cliente_id > clientes.id
+Ref: pedidos.mercado_id > mercados.id
+Ref: itens_pedido.pedido_id > pedidos.id
+Ref: itens_pedido.produto_id > produtos.id
+Ref: banners.mercado_id > mercados.id
