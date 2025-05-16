@@ -1,105 +1,88 @@
-Table mercados {
-  id integer [primary key]
-  nome varchar
-  cnpj varchar [unique]
-  email varchar
-  telefone varchar
-  logradouro varchar
-  bairro varchar
-  cep varchar
-  numero varchar
-  senha varchar
-  created_at timestamp
+Table restaurante {
+  id_restaurante         int     [pk, increment]
+  nome                   varchar
+  email                  varchar  [unique]
+  senha                  varchar
+  criado_em              datetime
+  status_licenciamento   varchar  // ativo, expirado, pendente
 }
 
-Table clientes {
-  id integer [primary key]
-  username varchar
-  email varchar [unique]
-  senha varchar
-  created_at timestamp
+Table licenciamento {
+  id_licenciamento       int     [pk, increment]
+  id_restaurante         int     [ref: > restaurante.id_restaurante]
+  data_inicio            date
+  data_fim               date
+  status                 varchar  // ativo, expirado, pendente
+  valor                  decimal
+  tipo                   varchar  // gratuito, mensal, anual
 }
 
-Table produtos {
-  id integer [primary key]
-  nome varchar
-  descricao text
-  preco decimal
-  categoria_id integer
-  mercado_id integer
-  status varchar
-  created_at timestamp
+Table usuario {
+  id_usuario             int     [pk, increment]
+  nome                   varchar
+  email                  varchar
+  senha                  varchar
+  funcao                 varchar  // admin, atendente, garçom, cozinha, bar, etc.
+  id_restaurante         int     [ref: > restaurante.id_restaurante]
+  ativo                  boolean
 }
 
-Table categorias {
-  id integer [primary key]
-  nome varchar
-  created_at timestamp
+Table categoria {
+  id_categoria           int     [pk, increment]
+  nome                   varchar
+  id_restaurante         int     [ref: > restaurante.id_restaurante]
 }
 
-Table pedidos {
-  id integer [primary key]
-  cliente_id integer
-  mercado_id integer
-  status varchar
-  total decimal
-  created_at timestamp
+Table produto {
+  id_produto             int     [pk, increment]
+  nome                   varchar
+  descricao              text
+  preco                  decimal
+  tipo_preparo           varchar  // cozinha, bar
+  id_categoria           int     [ref: > categoria.id_categoria]
+  id_restaurante         int     [ref: > restaurante.id_restaurante]
+  ativo                  boolean
 }
 
-Table enderecos {
-  id integer [primary key]
-  cliente_id integer [ref: > clientes.id, note: 'Pode ser NULL se for endereço de mercado']
-  mercado_id integer [ref: > mercados.id, note: 'Pode ser NULL se for endereço de cliente']
-  rua varchar [not null]
-  bairro varchar [not null]
-  cep varchar [not null]
-  numero varchar [not null]
-  complemento varchar
-  created_at timestamp
+Table forma_pagamento {
+  id_pagamento           int     [pk, increment]
+  descricao              varchar
+  id_restaurante         int     [ref: > restaurante.id_restaurante]
+  ativo                  boolean
 }
 
-Table itens_pedido {
-  id integer [primary key]
-  pedido_id integer
-  produto_id integer
-  quantidade integer
-  subtotal decimal
+Table mesa {
+  id_mesa                int     [pk, increment]
+  numero                 int
+  descricao              varchar
+  id_restaurante         int     [ref: > restaurante.id_restaurante]
+  ocupada                boolean
 }
 
-Table banners {
-  id integer [primary key]
-  mercado_id integer
-  imagem_url varchar
-  created_at timestamp
+Table pedido {
+  id_pedido              int     [pk, increment]
+  id_mesa                int     [ref: > mesa.id_mesa]
+  id_usuario             int     [ref: > usuario.id_usuario]
+  status                 varchar
+  tipo_preparo           varchar
+  data_abertura          datetime
+  data_fechamento        datetime
+  valor_total            decimal
+  observacoes            text
 }
 
-Table horarios_funcionamento {
-  id integer [primary key]
-  mercado_id integer [not null, ref: > mercados.id]
-  dia_semana varchar(20) [not null] // Ex: 'Segunda-feira', 'Terça-feira'...
-  horario_abertura time [not null]
-  horario_fechamento time [not null]
-  data_feriado date // Caso seja um feriado específico
-  created_at timestamp
-  Note: "Tabela para armazenar horários de funcionamento dos mercados."
+Table item_pedido {
+  id_item                int     [pk, increment]
+  id_pedido              int     [ref: > pedido.id_pedido]
+  id_produto             int     [ref: > produto.id_produto]
+  quantidade             int
+  preco_unitario         decimal
+  status                 varchar  // aguardando, em_preparo, pronto
 }
 
-Table formas_pagamento {
-  id integer [primary key]
-  nome varchar [not null, unique]
-  descricao text
+Table pedido_pagamento {
+  id_pagamento_pedido    int     [pk, increment]
+  id_pedido              int     [ref: > pedido.id_pedido]
+  id_pagamento           int     [ref: > forma_pagamento.id_pagamento]
+  valor_pago             decimal
 }
-
-Table mercado_formas_pagamento {
-  id integer [primary key]
-  mercado_id integer [ref: > mercados.id]
-  forma_pagamento_id integer [ref: > formas_pagamento.id]
-}
-
-Ref: produtos.categoria_id > categorias.id
-Ref: produtos.mercado_id > mercados.id
-Ref: pedidos.cliente_id > clientes.id
-Ref: pedidos.mercado_id > mercados.id
-Ref: itens_pedido.pedido_id > pedidos.id
-Ref: itens_pedido.produto_id > produtos.id
-Ref: banners.mercado_id > mercados.id

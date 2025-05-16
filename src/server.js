@@ -3,16 +3,16 @@ import rootRoutes from './routes/index.js'; // Importando as rotas do index.js
 const server = express();
 
 import routerPayment from './routes/payment.routes.js';
-import routerItensPedido from './routes/itenspedido.routes.js';
-import routerMercados from './routes/mercados.routes.js';
-import routerPedidos from './routes/pedidos.routes.js';
-import routerClientes from './routes/clientes.routes.js';
-import routerProdutos from './routes/produtos.routes.js';
-import routerCategorias from './routes/categorias.routes.js';
-import routerBanner from './routes/banners.routes.js';
-import routerCarrinho from './routes/carrinho.routes.js';
-import routerEndereco from './routes/enderecos.routes.js';
-import routerHorariosfuncionamento from './routes/horariosfuncionamento.routes.js';
+import routerRestaurante from './routes/restaurante.routes.js';
+import routerLicenciamento from './routes/licenciamento.routes.js';
+import routerUsuario from './routes/usuario.routes.js';
+import routerCategoria from './routes/categoria.routes.js';
+import routerProduto from './routes/produto.routes.js';
+import routerFormaPagamento from './routes/formaPagamento.routes.js';
+import routerMesa from './routes/mesa.routes.js';
+import routerPedido from './routes/pedido.routes.js';
+import routerItemPedido from './routes/itemPedido.routes.js';
+import routerPedidoPagamento from './routes/pedidoPagamento.routes.js';
 
 const PORT = process.env.PORT || 3000;
 
@@ -21,21 +21,18 @@ server.use("/", rootRoutes); // Usando as rotas do index.js
 server.use(express.json());
 
 server.use("/api", routerPayment);
-server.use("/api", routerItensPedido);
-server.use("/api", routerMercados);
-server.use("/api", routerPedidos);
-server.use("/api", routerClientes);
-server.use("/api", routerProdutos);
-server.use("/api", routerCategorias);
-server.use("/api", routerBanner);
-server.use("/api", routerCarrinho);
-server.use("/api", routerEndereco);
-server.use("/api", routerHorariosfuncionamento);
+server.use("/api/restaurantes", routerRestaurante);
+server.use("/api/licenciamentos", routerLicenciamento);
+server.use("/api/usuarios", routerUsuario);
+server.use("/api/categorias", routerCategoria);
+server.use("/api/produtos", routerProduto);
+server.use("/api/formaspagamento", routerFormaPagamento);
+server.use("/api/mesas", routerMesa);
+server.use("/api/pedidos", routerPedido);
+server.use("/api/itempedido", routerItemPedido);
+server.use("/api/pedidopagamento", routerPedidoPagamento);
 
-// Teste simples das rotas raiz
-// server.get("/", (req, res) => {
-//     res.send("GET World " + new Date());
-// });
+
 
 server.get("/", (req, res) => {
     res.send("Primeira Rota do Backend - TCC");
