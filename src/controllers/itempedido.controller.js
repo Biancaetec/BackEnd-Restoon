@@ -1,11 +1,12 @@
 import { z } from "zod";
 
 const ItemPedidoSchema = z.object({
-  id_item: z.number().int().positive().optional(),
+    id_item: z.number().int().positive().optional(),
   id_pedido: z.number().int().positive(),
   id_produto: z.number().int().positive(),
   quantidade: z.number().int().positive(),
   preco_unitario: z.number().positive(),
+  tipo_porção: z.enum(["inteira", "meia"]),  
   status: z.enum(["aguardando", "em_preparo", "pronto"]),
 });
 

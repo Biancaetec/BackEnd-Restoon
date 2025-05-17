@@ -24,6 +24,7 @@ export function up(knex) {
       .onDelete('CASCADE')
       .notNullable();
     table.boolean('ativo').notNullable().defaultTo(true);
+    table.string('imagem', 255).nullable();
   });
 }
 

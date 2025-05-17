@@ -21,6 +21,7 @@ export function up(knex) {
       .nullable();
     table.integer('quantidade').notNullable();
     table.decimal('preco_unitario', 10, 2).notNullable();
+    table.enum('tipo_porção', ['inteira', 'meia']).defaultTo('inteira');
     table.string('status').notNullable(); // aguardando, em_preparo, pronto
   });
 }

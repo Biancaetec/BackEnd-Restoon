@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 const ProdutoSchema = z.object({
-  id_produto: z.number().int().positive().optional(),
+   id_produto: z.number().int().positive().optional(),
   nome: z.string(),
   descricao: z.string(),
   preco: z.number().nonnegative(),
@@ -9,6 +9,7 @@ const ProdutoSchema = z.object({
   id_categoria: z.number().int().positive(),
   id_restaurante: z.number().int().positive(),
   ativo: z.boolean(),
+  imagem: z.string().url("URL inválida").optional(),  
 });
 
 const ProdutoController = {
