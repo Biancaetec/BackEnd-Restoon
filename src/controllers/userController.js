@@ -1,6 +1,9 @@
-export const getUsers = (req, res) => {
+import { findAll } from "../models/userModel.js";
+
+export const getUsers = async (req, res) => {
     try {
-        res.status(200).json({ message: "Get Users" });
+        const usuario = await findAll()
+        res.status(200).json(usuario);
     }
     catch (error) {
         console.error(error);

@@ -1,88 +1,90 @@
 Table restaurante {
-  id_restaurante         int     [pk, increment]
-  nome                   varchar
-  email                  varchar  [unique]
-  senha                  varchar
-  criado_em              datetime
-  status_licenciamento   varchar  // ativo, expirado, pendente
+  id_restaurante int [pk, increment]
+  nome varchar
+  email varchar [unique]
+  senha varchar
+  criado_em datetime
+  status_licenciamento varchar // ativo, expirado, pendente
 }
 
 Table licenciamento {
-  id_licenciamento       int     [pk, increment]
-  id_restaurante         int     [ref: > restaurante.id_restaurante]
-  data_inicio            date
-  data_fim               date
-  status                 varchar  // ativo, expirado, pendente
-  valor                  decimal
-  tipo                   varchar  // gratuito, mensal, anual
+  id_licenciamento int [pk, increment]
+  id_restaurante int [ref: > restaurante.id_restaurante]
+  data_inicio date
+  data_fim date
+  status varchar // ativo, expirado, pendente
+  valor decimal
+  tipo varchar // gratuito, mensal, anual
 }
 
 Table usuario {
-  id_usuario             int     [pk, increment]
-  nome                   varchar
-  email                  varchar
-  senha                  varchar
-  funcao                 varchar  // admin, atendente, garçom, cozinha, bar, etc.
-  id_restaurante         int     [ref: > restaurante.id_restaurante]
-  ativo                  boolean
+  id_usuario int [pk, increment]
+  nome varchar
+  email varchar
+  senha varchar
+  funcao varchar // admin, atendente, garçom, cozinha, bar, etc.
+  id_restaurante int [ref: > restaurante.id_restaurante]
+  ativo boolean
 }
 
 Table categoria {
-  id_categoria           int     [pk, increment]
-  nome                   varchar
-  id_restaurante         int     [ref: > restaurante.id_restaurante]
+  id_categoria int [pk, increment]
+  nome varchar
+  id_restaurante int [ref: > restaurante.id_restaurante]
 }
 
 Table produto {
-  id_produto             int     [pk, increment]
-  nome                   varchar
-  descricao              text
-  preco                  decimal
-  tipo_preparo           varchar  // cozinha, bar
-  id_categoria           int     [ref: > categoria.id_categoria]
-  id_restaurante         int     [ref: > restaurante.id_restaurante]
-  ativo                  boolean
+  id_produto int [pk, increment]
+  nome varchar
+  descricao text
+  preco decimal
+  tipo_preparo varchar // cozinha, bar
+  id_categoria int [ref: > categoria.id_categoria]
+  id_restaurante int [ref: > restaurante.id_restaurante]
+  ativo boolean
+  imagem varchar // URL ou caminho da imagem do produto
 }
 
 Table forma_pagamento {
-  id_pagamento           int     [pk, increment]
-  descricao              varchar
-  id_restaurante         int     [ref: > restaurante.id_restaurante]
-  ativo                  boolean
+  id_pagamento int [pk, increment]
+  descricao varchar
+  id_restaurante int [ref: > restaurante.id_restaurante]
+  ativo boolean
 }
 
 Table mesa {
-  id_mesa                int     [pk, increment]
-  numero                 int
-  descricao              varchar
-  id_restaurante         int     [ref: > restaurante.id_restaurante]
-  ocupada                boolean
+  id_mesa int [pk, increment]
+  numero int
+  descricao varchar
+  id_restaurante int [ref: > restaurante.id_restaurante]
+  ocupada boolean
 }
 
 Table pedido {
-  id_pedido              int     [pk, increment]
-  id_mesa                int     [ref: > mesa.id_mesa]
-  id_usuario             int     [ref: > usuario.id_usuario]
-  status                 varchar
-  tipo_preparo           varchar
-  data_abertura          datetime
-  data_fechamento        datetime
-  valor_total            decimal
-  observacoes            text
+  id_pedido int [pk, increment]
+  id_mesa int [ref: > mesa.id_mesa]
+  id_usuario int [ref: > usuario.id_usuario]
+  status varchar 
+  tipo_preparo varchar 
+  data_abertura datetime
+  data_fechamento datetime
+  valor_total decimal
+  observacoes text 
 }
 
 Table item_pedido {
-  id_item                int     [pk, increment]
-  id_pedido              int     [ref: > pedido.id_pedido]
-  id_produto             int     [ref: > produto.id_produto]
-  quantidade             int
-  preco_unitario         decimal
-  status                 varchar  // aguardando, em_preparo, pronto
+  id_item int [pk, increment]
+  id_pedido int [ref: > pedido.id_pedido]
+  id_produto int [ref: > produto.id_produto]
+  quantidade int
+  preco_unitario decimal
+  tipo_porção enum('inteira', 'meia') // indica meia ou inteira
+  status varchar // aguardando, em_preparo, pronto
 }
 
 Table pedido_pagamento {
-  id_pagamento_pedido    int     [pk, increment]
-  id_pedido              int     [ref: > pedido.id_pedido]
-  id_pagamento           int     [ref: > forma_pagamento.id_pagamento]
-  valor_pago             decimal
+  id_pagamento_pedido int [pk, increment]
+  id_pedido int [ref: > pedido.id_pedido]
+  id_pagamento int [ref: > forma_pagamento.id_pagamento]
+  valor_pago decimal
 }

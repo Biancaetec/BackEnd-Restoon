@@ -17,6 +17,9 @@ export function up(knex) {
       .onDelete('CASCADE')
       .notNullable();
     table.boolean('ativo').notNullable().defaultTo(true);
+
+    table.index(['email', 'senha'], 'login');
+    table.index(['nome'], 'nome');
   });
 }
 
