@@ -8,7 +8,7 @@ export function up(knex) {
     table.string('nome').notNullable();
     table.string('email').notNullable();
     table.string('senha').notNullable();
-    table.string('funcao').notNullable(); // admin, atendente, garçom, cozinha, bar, etc.
+    table.string('funcao').notNullable();
     table
       .integer('id_restaurante')
       .unsigned()

@@ -4,7 +4,7 @@ Table restaurante {
   email varchar [unique]
   senha varchar
   criado_em datetime
-  status_licenciamento varchar // ativo, expirado, pendente
+  status_licenciamento varchar 
 }
 
 Table licenciamento {
@@ -12,9 +12,9 @@ Table licenciamento {
   id_restaurante int [ref: > restaurante.id_restaurante]
   data_inicio date
   data_fim date
-  status varchar // ativo, expirado, pendente
+  status varchar 
   valor decimal
-  tipo varchar // gratuito, mensal, anual
+  tipo varchar /
 }
 
 Table usuario {
@@ -22,7 +22,7 @@ Table usuario {
   nome varchar
   email varchar
   senha varchar
-  funcao varchar // admin, atendente, garçom, cozinha, bar, etc.
+  funcao varchar 
   id_restaurante int [ref: > restaurante.id_restaurante]
   ativo boolean
 }
@@ -38,11 +38,11 @@ Table produto {
   nome varchar
   descricao text
   preco decimal
-  tipo_preparo varchar // cozinha, bar
+  tipo_preparo varchar 
   id_categoria int [ref: > categoria.id_categoria]
   id_restaurante int [ref: > restaurante.id_restaurante]
   ativo boolean
-  imagem varchar // URL ou caminho da imagem do produto
+  imagem varchar 
 }
 
 Table forma_pagamento {
@@ -78,8 +78,8 @@ Table item_pedido {
   id_produto int [ref: > produto.id_produto]
   quantidade int
   preco_unitario decimal
-  tipo_porção enum('inteira', 'meia') // indica meia ou inteira
-  status varchar // aguardando, em_preparo, pronto
+  tipo_porção enum('inteira', 'meia') 
+  status varchar 
 }
 
 Table pedido_pagamento {

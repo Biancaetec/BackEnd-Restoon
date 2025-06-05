@@ -16,15 +16,15 @@ import pedidoPagamentoRoutes from './pedidoPagamento.routes.js';
 
 router.use('/api',paymentRoutes);
 router.use('/api', userRoutes);
-router.use('/api/restaurantes', restauranteRoutes);
-router.use('/api/licenciamentos', licenciamentoRoutes);
-router.use('/api/usuarios', usuarioRoutes);
-router.use('/api/categorias', categoriaRoutes);
-router.use('/api/produtos', produtoRoutes);
-router.use('/api/formaspagamento', formaPagamentoRoutes);
-router.use('/api/mesas', mesaRoutes);
-router.use('/api/pedidos', pedidoRoutes);
-router.use('/api/itempedido', itemPedidoRoutes);
-router.use('/api/pedidopagamento', pedidoPagamentoRoutes);
+router.use('/api', restauranteRoutes);
+router.use('/api', licenciamentoRoutes);
+router.use('/api', usuarioRoutes);
+router.use('/api', categoriaRoutes);
+router.use('/api', produtoRoutes);
+router.use('/api', formaPagamentoRoutes);
+router.use('/api', mesaRoutes);
+router.use('/api', pedidoRoutes);
+router.use('/api', itemPedidoRoutes);
+router.use('/api', pedidoPagamentoRoutes);
 
 export default router;

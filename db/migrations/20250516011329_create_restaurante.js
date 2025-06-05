@@ -3,7 +3,7 @@
  * @returns { Promise<void> }
  */
 export function up(knex) {
-  return knex.schema.createTable('restaurantes', (table) => {
+  return knex.schema.createTable('restaurante', (table) => {
     table.increments('id_restaurante').primary();
     table.string('nome').notNullable();
     table.string('email').notNullable().unique();
@@ -18,5 +18,5 @@ export function up(knex) {
  * @returns { Promise<void> }
  */
 export function down(knex) {
-  return knex.schema.dropTable('restaurantes');
+  return knex.schema.dropTable('restaurante');
 };

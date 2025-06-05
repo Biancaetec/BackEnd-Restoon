@@ -8,7 +8,7 @@ export function up(knex) {
     table.string('nome').notNullable();
     table.text('descricao').notNullable();
     table.decimal('preco', 10, 2).notNullable();
-    table.string('tipo_preparo').notNullable(); // cozinha, bar
+    table.string('tipo_preparo').notNullable(); 
     table
       .integer('id_categoria')
       .unsigned()
