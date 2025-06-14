@@ -2,15 +2,22 @@
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-export function up(knex) {
-  return knex.schema.createTable('restaurante', (table) => {
+exports.up = function(knex) {
+  return knex.schema.createTable('restaurante', function(table) {
     table.increments('id_restaurante').primary();
-    table.string('nome').notNullable();
-    table.string('email').notNullable().unique();
-    table.string('senha').notNullable();
+    table.integer('id_usuario').notNullable(); // Caso deseje referenciar um usuário
+    table.string('nome');
+    table.string('email').unique();
+    table.string('senha');
     table.datetime('criado_em').defaultTo(knex.fn.now());
-    table.enum('status_licenciamento', ['ativo', 'expirado', 'pendente']).notNullable();
+    table.enu('status_licenciamento', ['ativo', 'expirado', 'pendente']);
   });
+};
+
+exports.down = function(knex) {
+  return knex.schema.dropTable('restaurante');
+};
+
 };
 
 /**

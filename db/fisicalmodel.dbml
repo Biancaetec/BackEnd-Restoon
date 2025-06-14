@@ -1,10 +1,11 @@
 Table restaurante {
   id_restaurante int [pk, increment]
+  id_usuario int [pk, increment ]
   nome varchar
   email varchar [unique]
   senha varchar
   criado_em datetime
-  status_licenciamento varchar 
+  status_licenciamento varchar // ativo, expirado, pendente
 }
 
 Table licenciamento {
@@ -12,9 +13,9 @@ Table licenciamento {
   id_restaurante int [ref: > restaurante.id_restaurante]
   data_inicio date
   data_fim date
-  status varchar 
+  status varchar // ativo, expirado, pendente
   valor decimal
-  tipo varchar /
+  tipo varchar // gratuito, mensal, anual
 }
 
 Table usuario {
@@ -22,8 +23,7 @@ Table usuario {
   nome varchar
   email varchar
   senha varchar
-  funcao varchar 
-  id_restaurante int [ref: > restaurante.id_restaurante]
+  funcao varchar // admin, atendente, garçom, cozinha, bar, etc.
   ativo boolean
 }
 
@@ -38,12 +38,13 @@ Table produto {
   nome varchar
   descricao text
   preco decimal
-  tipo_preparo varchar 
+  id_setor int [ref: > setor.id_setor]
   id_categoria int [ref: > categoria.id_categoria]
   id_restaurante int [ref: > restaurante.id_restaurante]
   ativo boolean
-  imagem varchar 
+  imagem varchar
 }
+
 
 Table forma_pagamento {
   id_pagamento int [pk, increment]
@@ -64,12 +65,12 @@ Table pedido {
   id_pedido int [pk, increment]
   id_mesa int [ref: > mesa.id_mesa]
   id_usuario int [ref: > usuario.id_usuario]
-  status varchar 
-  tipo_preparo varchar 
+  status varchar
+  tipo_preparo varchar
   data_abertura datetime
   data_fechamento datetime
   valor_total decimal
-  observacoes text 
+  observacoes text
 }
 
 Table item_pedido {
@@ -78,8 +79,8 @@ Table item_pedido {
   id_produto int [ref: > produto.id_produto]
   quantidade int
   preco_unitario decimal
-  tipo_porção enum('inteira', 'meia') 
-  status varchar 
+  tipo_porção enum('inteira', 'meia')
+  status varchar
 }
 
 Table pedido_pagamento {
@@ -88,3 +89,39 @@ Table pedido_pagamento {
   id_pagamento int [ref: > forma_pagamento.id_pagamento]
   valor_pago decimal
 }
+
+Table setor {
+  id_setor int [pk, increment]
+  nome varchar
+}
+
+Table adicional {
+  id_adicional int [pk, increment]
+  nome varchar
+  preco decimal
+  custo decimal
+  id_restaurante int [ref: > restaurante.id_restaurante]
+}
+
+Table item_pedido_adicional {
+  id int [pk, increment]
+  id_item_pedido int [ref: > item_pedido.id_item]
+  id_adicional int [ref: > adicional.id_adicional]
+}
+
+Table permissao {
+  id_permissao int [pk, increment]
+  nome varchar // ex: 'visualizar_pedidos', 'editar_cardapio'
+}
+
+Table usuario_permissao {
+  id int [pk, increment]
+  id_usuario int [ref: > usuario.id_usuario]
+  id_permissao int [ref: > permissao.id_permissao]
+}
+
+
+
+
+
+Ref: "permissao"."id_permissao" < "permissao"."nome"
