@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 
 import paymentRoutes from './payment.routes.js';
-import userRoutes from './user.routes.js';
+import userRoutes from './userRoutes.js';
 import restauranteRoutes from './restaurante.routes.js';
 import licenciamentoRoutes from './licenciamento.routes.js';
 import usuarioRoutes from './usuario.routes.js';
