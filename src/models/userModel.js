@@ -26,3 +26,33 @@ export async function create(userData) {
     throw new Error("Error creating user: " + error.message);
   }
 }
+
+export async function remove(id) {
+ try {
+    const database = await connectDB();
+    const query = "DELETE FROM users WHERE id = ?;";
+    const statement = database.prepare(query);
+    const result = statement.run(id);
+    if (result.changes === 0) {
+      throw new Error("User not found");
+    } 
+    return result;
+ }catch (error) {
+   console.error(error);
+   throw new Error("Error deleting user: " + error.message);
+ }
+
+}
+
+export async function update(id, userData) {
+  try {
+    const database = await connectDB();
+    const query = "UPDATE users SET nome = ?, email = ? WHERE id = ?;";
+    const statement = database.prepare(query);
+    const result = statement.run(userData.username, userData.email, id);
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Error updating user: " + error.message);
+  }
+}

@@ -35,3 +35,44 @@ export async function create(userData) {
     throw new Error("Erro ao criar usuário: " + error.message);
   }
 }
+export async function remove(id) {
+  try {
+    const db = await connectDB();
+    const result = await db.run("DELETE FROM usuario WHERE id_usuario = ?", [id]);
+
+    if (result.changes === 0) {
+      throw new Error("Usuário não encontrado");
+    }
+
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Erro ao deletar usuário: " + error.message);
+  }
+}
+
+export async function update(id, usuarioData) {
+  try {
+    const db = await connectDB();
+    const query = `
+      UPDATE usuario 
+      SET nome = ?, email = ?, senha = ?, funcao = ?, id_restaurante = ?, ativo = ?
+      WHERE id_usuario = ?;
+    `;
+
+    const result = await db.run(query, [
+      usuarioData.nome,
+      usuarioData.email,
+      usuarioData.senha,
+      usuarioData.funcao,
+      usuarioData.id_restaurante,
+      usuarioData.ativo,
+      id
+    ]);
+
+    return result;
+  } catch (error) {
+    console.error(error);
+    throw new Error("Erro ao atualizar usuário: " + error.message);
+  }
+}
