@@ -66,98 +66,121 @@
 // export default UsuarioController;
 
 import { z } from "zod";
-import {create, findAll, remove, update} from "../models/usuario.model.js"; // Certifique-se que `findAll` existe no model
+import { findAll, create, remove, update, updateFuncao } from "../models/usuario.model.js";
 
-const UsuarioSchema = z.object({
-  id_usuario: z.number().int().positive().optional(),
-  nome: z.string(),
-  email: z.string().email(),
-  senha: z.string(),
-  funcao: z.string(),
-  id_restaurante: z.number().int().positive(),
+// Schema principal de usuário (POST e PUT)
+const usuarioSchema = z.object({
+  nome: z.string().min(1, "Nome é obrigatório"),
+  email: z.string().email("E-mail inválido"),
+  senha: z.string().optional(),
+  funcao: z.enum(["garçom", "admin"], {
+    errorMap: () => ({ message: "Função inválida" }),
+  }),
+  id_restaurante: z.number().int().positive("ID do restaurante deve ser positivo"),
   ativo: z.boolean(),
 });
 
+// Schema somente para atualização de função (PATCH)
+const funcaoSchema = z.object({
+  funcao: z.enum(["garçom", "admin"], {
+    errorMap: () => ({ message: "Função inválida" }),
+  }),
+});
+
+// GET - Buscar todos os usuários
+export const getUsers = async (req, res) => {
+  try {
+    const usuarios = await findAll();
+    res.status(200).json(usuarios);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro interno ao buscar usuários" });
+  }
+};
+
+// POST - Criar novo usuário
 export const createUser = async (req, res) => {
   try {
-    const validUser = UsuarioSchema.parse(req.body);
-    const result = await create(validUser);
-
+    const userData = usuarioSchema.parse(req.body);
+    const result = await create(userData);
     res.status(201).json({
       message: "Usuário criado com sucesso",
-      userId: result.lastID ?? result.lastInsertRowid,
+      userId: result.lastInsertRowid ?? result.lastID,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.errors.map(e => ({
+      const errors = error.errors.map((e) => ({
         atributo: e.path[0],
         mensagem: e.message,
       }));
-
-      return res.status(400).json({
-        message: "Erro de validação",
-        errors,
-      });
+      return res.status(400).json({ message: "Erro de validação", errors });
     }
-
-    res.status(500).json({ message: "Erro interno no servidor" });
+    console.error(error);
+    res.status(500).json({ message: "Erro interno no servidor - Controller" });
   }
 };
 
-export const getUsers = async (req, res) => {
-  try {
-    const usuarios = await findAll(); // Supondo que findAll() retorna todos os usuários
-    res.status(200).json(usuarios);
-  } catch (error) {
-    res.status(500).json({ message: "Erro ao buscar usuários" });
-  }
-};
-
-
+// DELETE - Deletar usuário
 export const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-
     const result = await remove(id);
-
     if (result.changes === 0) {
       return res.status(404).json({ message: "Usuário não encontrado" });
     }
-
-    return res.status(200).json({ message: "Usuário deletado com sucesso" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erro interno no servidor - Controller" });
-  }
-}
-
-export const updateUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const usuarioData = req.body;
-
-    // Validação básica (opcional, mas recomendado)
-    if (
-      !usuarioData.nome ||
-      !usuarioData.email ||
-      !usuarioData.senha ||
-      !usuarioData.funcao ||
-      usuarioData.id_restaurante === undefined ||
-      usuarioData.ativo === undefined
-    ) {
-      return res.status(400).json({ message: "Dados incompletos para atualização" });
-    }
-
-    const result = await update(id, usuarioData);
-
-    if (result.changes === 0) {
-      return res.status(404).json({ message: "Usuário não encontrado" });
-    }
-
-    res.status(200).json({ message: "Usuário atualizado com sucesso" });
+    res.status(200).json({ message: "Usuário deletado com sucesso" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erro interno no servidor - Controller" });
   }
 };
-;
+
+// PUT - Atualizar usuário (parcial)
+export const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateSchema = usuarioSchema.partial();
+    const usuarioData = updateSchema.parse(req.body);
+
+    const result = await update(id, usuarioData);
+    if (result.changes === 0) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+    res.status(200).json({ message: "Usuário atualizado com sucesso" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.errors.map((e) => ({
+        atributo: e.path[0],
+        mensagem: e.message,
+      }));
+      return res.status(400).json({ message: "Erro de validação", errors });
+    }
+    console.error(error);
+    res.status(500).json({ message: "Erro interno no servidor - Controller" });
+  }
+};
+
+// PATCH - Atualizar função do usuário
+export const updateUserFuncao = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { funcao } = funcaoSchema.parse(req.body);
+
+    const result = await updateFuncao(id, funcao);
+    if (result.changes === 0) {
+      return res.status(404).json({ message: "Usuário não encontrado" });
+    }
+
+    res.status(200).json({ message: "Função do usuário atualizada com sucesso" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errors = error.errors.map((e) => ({
+        atributo: e.path[0],
+        mensagem: e.message,
+      }));
+      return res.status(400).json({ message: "Erro de validação", errors });
+    }
+    console.error(error);
+    res.status(500).json({ message: "Erro interno no servidor - Controller" });
+  }
+};

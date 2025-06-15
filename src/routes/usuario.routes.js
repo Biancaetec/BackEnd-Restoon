@@ -12,13 +12,28 @@
 import express from 'express';
 const router = express.Router();
 
-import {getUsers, createUser, deleteUser, updateUser} from '../controllers/usuario.controller.js';
+import {
+  getUsers,
+  createUser,
+  deleteUser,
+  updateUser,
+  updateUserFuncao // adicionada para alterar apenas a função do usuário
+} from '../controllers/usuario.controller.js';
 
+// Buscar todos os usuários
 router.get('/usuario', getUsers);
+
+// Criar novo usuário
 router.post('/usuario', createUser);
+
+// Deletar usuário por ID
 router.delete("/usuario/:id", deleteUser);
+
+// Atualizar dados gerais do usuário
 router.patch("/usuario/:id", updateUser);
 
+// Atualizar apenas a função do usuário
+router.patch("/usuario/funcao/:id", updateUserFuncao);
 
 export default router;
 
