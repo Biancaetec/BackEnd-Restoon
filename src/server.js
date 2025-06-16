@@ -2,7 +2,7 @@ import express from 'express';
 import router from './routes/index.js'; // Importando as rotas principais
 
 const server = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Middleware para interpretar JSON e dados de formulário
 server.use(express.urlencoded({ extended: true }));

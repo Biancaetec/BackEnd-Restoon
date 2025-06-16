@@ -7,7 +7,7 @@ import {
     deleteRestaurante,
     updateRestaurante,
     updateRestauranteStatus
-} from "../controllers/restauranteController.js";
+} from "../controllers/restaurante.controller.js";
 
 router.get('/restaurante', getRestaurantes);
 router.post('/restaurante', createRestaurante);
