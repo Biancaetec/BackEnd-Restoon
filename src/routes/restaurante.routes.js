@@ -1,10 +1,18 @@
 import express from 'express';
 const router = express.Router();
 
-import RestauranteController from '../controllers/restaurante.controller.js';
+import {
+    getRestaurantes,
+    createRestaurante,
+    deleteRestaurante,
+    updateRestaurante,
+    updateRestauranteStatus
+} from "../controllers/restauranteController.js";
 
-router.post('/restaurante', RestauranteController.createRestaurante);
-router.get('/restaurante', RestauranteController.getRestaurantes);
-router.patch('/restaurante/:id', RestauranteController.updateRestaurante);
+router.get('/restaurante', getRestaurantes);
+router.post('/restaurante', createRestaurante);
+router.delete('/restaurante/:id', deleteRestaurante);
+router.patch('/restaurante/:id', updateRestaurante);
+router.patch('/restaurante/status/:id', updateRestauranteStatus);
 
 export default router;
