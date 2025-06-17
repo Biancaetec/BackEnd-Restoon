@@ -1,6 +1,6 @@
-Table restaurante {
+Table restaurante{
   id_restaurante int [pk, increment]
-  id_usuario int [pk, increment ]
+  id_usuario int [ref: > usuario.id_usuario]
   nome varchar
   email varchar [unique]
   senha varchar
@@ -13,7 +13,7 @@ Table licenciamento {
   id_restaurante int [ref: > restaurante.id_restaurante]
   data_inicio date
   data_fim date
-  status varchar // ativo, expirado, pendente
+  status varchar // ativo, expirado, pendente 
   valor decimal
   tipo varchar // gratuito, mensal, anual
 }

@@ -12,26 +12,27 @@
 import express from 'express';
 const router = express.Router();
 
-// Controllers
-import { 
-  getUsers, 
-  createUser, 
-  deleteUser, 
-  updateUser, 
-  updateUserRole 
+// Controllers - Usuário
+import {
+  getUsers,
+  createUser,
+  deleteUser,
+  updateUser,
+  updateUserRole
 } from "../controllers/userController.js";
 
-import { 
-  create as createCategoria, 
-  get as getCategorias, 
-  update as updateCategoria 
+// Controllers - Categoria
+import {
+  createCategoria,
+  getCategorias,
+  updateCategoria
 } from "../controllers/categoria.controller.js";
 
 // Rotas de Usuário
 router.get('/user', getUsers);
 router.post('/user', createUser);
 router.delete('/user/:id', deleteUser);
-router.patch('/user/:id', updateUser);         // Adiciona updateUser se estiver faltando
+router.patch('/user/:id', updateUser);
 router.patch('/user/role/:id', updateUserRole);
 
 // Rotas de Categoria
@@ -40,4 +41,5 @@ router.get('/categoria', getCategorias);
 router.patch('/categoria/:id_categoria', updateCategoria);
 
 export default router;
+
 

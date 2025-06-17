@@ -5,25 +5,25 @@ export async function findAll() {
   try {
     const db = await connectDB();
     const query = "SELECT * FROM restaurante;";
-    const statement = db.prepare(query);
-    const result = statement.all();
-    return result;
+    const restaurante = await db.all(query);
+    return restaurante;
   } catch (error) {
     console.error(error);
-    throw new Error("Erro ao buscar restaurantes: " + error.message);
+    throw new Error("Erro ao buscar restaurante: " + error.message);
   }
 }
 
-// Criar novo restaurante e retornar o restaurante criado
+// Criar novo restaurante
 export async function create(data) {
   try {
     const db = await connectDB();
     const query = `
-      INSERT INTO restaurante (nome, email, senha, criado_em, status_licenciamento)
-      VALUES (?, ?, ?, ?, ?);
+      INSERT INTO restaurante (id_usuario, nome, email, senha, criado_em, status_licenciamento)
+      VALUES (?, ?, ?, ?, ?, ?);
     `;
-    const statement = db.prepare(query);
-    const result = statement.run(
+    const result = await db.run(
+      query,
+      data.id_usuario,
       data.nome,
       data.email,
       data.senha,
@@ -31,8 +31,7 @@ export async function create(data) {
       data.status_licenciamento
     );
 
-    // Pega o restaurante recém-criado pelo ID gerado
-    const novoRestaurante = db.prepare("SELECT * FROM restaurante WHERE id_restaurante = ?").get(result.lastInsertRowid);
+    const novoRestaurante = await db.get("SELECT * FROM restaurante WHERE id_restaurante = ?", result.lastID);
     return novoRestaurante;
   } catch (error) {
     console.error(error);
@@ -40,8 +39,8 @@ export async function create(data) {
   }
 }
 
-// Atualizar dados completos do restaurante
-export async function update(id, data) {
+// Atualizar restaurante
+export async function update(id_restaurante, data) {
   try {
     const db = await connectDB();
     const query = `
@@ -49,14 +48,14 @@ export async function update(id, data) {
       SET nome = ?, email = ?, senha = ?, criado_em = ?, status_licenciamento = ?
       WHERE id_restaurante = ?;
     `;
-    const statement = db.prepare(query);
-    const result = statement.run(
+    const result = await db.run(
+      query,
       data.nome,
       data.email,
       data.senha,
       data.criado_em,
       data.status_licenciamento,
-      id
+      id_restaurante
     );
     return result;
   } catch (error) {
@@ -65,22 +64,21 @@ export async function update(id, data) {
   }
 }
 
-// Deletar restaurante pelo ID
-export async function remove(id) {
+// Deletar restaurante
+export async function remove(id_restaurante) {
   try {
     const db = await connectDB();
-    const query = "DELETE FROM restaurante WHERE id_restaurante = ?;";
-    const statement = db.prepare(query);
-    const result = statement.run(id);
+    const query = `DELETE FROM restaurante WHERE id_restaurante = ?;`;
+    const result = await db.run(query, id_restaurante);
     return result;
   } catch (error) {
     console.error(error);
-    throw new Error("Erro ao remover restaurante: " + error.message);
+    throw new Error("Erro ao deletar restaurante: " + error.message);
   }
 }
 
-// Atualizar somente o status de licenciamento do restaurante
-export async function updateStatusLicenciamento(id, status) {
+// Atualizar status de licenciamento
+export async function updateStatus(id_restaurante, status) {
   try {
     const db = await connectDB();
     const query = `
@@ -88,8 +86,7 @@ export async function updateStatusLicenciamento(id, status) {
       SET status_licenciamento = ?
       WHERE id_restaurante = ?;
     `;
-    const statement = db.prepare(query);
-    const result = statement.run(status, id);
+    const result = await db.run(query, status, id_restaurante);
     return result;
   } catch (error) {
     console.error(error);

@@ -57,98 +57,41 @@
 //};
 
 //export default FormaPagamentoController;
-import { z } from "zod";
+// src/controllers/formapagamento.controller.js
 
-// Schema de validação
-const formaPagamentoSchema = z.object({
-  id_pagamento: z.number().int().positive().optional(),
-  descricao: z.string().min(1, "Descrição é obrigatória"),
-  id_restaurante: z.number().int().positive(),
-  ativo: z.boolean(),
-});
+// Exemplo simples, adapte a lógica conforme seu banco ou regras
 
-// Listar formas de pagamento
-export const getFormasPagamento = async (req, res) => {
+export const create = async (req, res) => {
   try {
-    const data = [
-      {
-        id_pagamento: 1,
-        descricao: "Cartão de Crédito",
-        id_restaurante: 1,
-        ativo: true,
-      },
-      {
-        id_pagamento: 2,
-        descricao: "Dinheiro",
-        id_restaurante: 1,
-        ativo: true,
-      },
+    // lógica para criar forma de pagamento
+    const data = req.body;
+    // simula inserção no banco
+    res.status(201).json({ message: "Forma de pagamento criada", data });
+  } catch (error) {
+    res.status(500).json({ message: "Erro ao criar forma de pagamento" });
+  }
+};
+
+export const get = async (req, res) => {
+  try {
+    // simula busca no banco
+    const formasPagamento = [
+      { id: 1, nome: "Cartão de Crédito" },
+      { id: 2, nome: "Dinheiro" },
     ];
-    res.status(200).json(data);
+    res.status(200).json(formasPagamento);
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao listar formas de pagamento" });
+    res.status(500).json({ message: "Erro ao buscar formas de pagamento" });
   }
 };
 
-// Criar nova forma de pagamento
-export const createFormaPagamento = async (req, res) => {
+export const update = async (req, res) => {
   try {
-    const formaData = formaPagamentoSchema.parse(req.body);
-
-    // Simulação de criação (trocar por model real depois)
-    // const result = await createFormaPagamentoNoBanco(formaData);
-
-    res.status(201).json({ message: "Forma de pagamento criada com sucesso", forma: formaData });
+    const { id } = req.params;
+    const dadosAtualizados = req.body;
+    // simula update no banco
+    res.status(200).json({ message: `Forma de pagamento ${id} atualizada`, dadosAtualizados });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        message: "Erro de validação",
-        errors: error.errors.map(e => ({ atributo: e.path[0], mensagem: e.message })),
-      });
-    }
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao criar forma de pagamento" });
-  }
-};
-
-// Atualizar forma de pagamento
-export const updateFormaPagamento = async (req, res) => {
-  try {
-    const { id_pagamento } = req.params;
-    const formaData = formaPagamentoSchema.partial().parse(req.body);
-
-    // Simulação de atualização (trocar por model real depois)
-    // const result = await updateFormaPagamentoNoBanco(id_pagamento, formaData);
-
-    res.status(200).json({ message: `Forma de pagamento ${id_pagamento} atualizada com sucesso` });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        message: "Erro de validação",
-        errors: error.errors.map(e => ({ atributo: e.path[0], mensagem: e.message })),
-      });
-    }
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao atualizar forma de pagamento" });
-  }
-};
-
-// Deletar forma de pagamento (opcional, incluído para seguir padrão)
-export const deleteFormaPagamento = async (req, res) => {
-  try {
-    const { id_pagamento } = req.params;
-
-    // Simulação de exclusão (trocar por model real depois)
-    // const result = await deleteFormaPagamentoDoBanco(id_pagamento);
-
-    // if (result.changes === 0) {
-    //   return res.status(404).json({ message: "Forma de pagamento não encontrada" });
-    // }
-
-    res.status(200).json({ message: `Forma de pagamento ${id_pagamento} deletada com sucesso` });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao deletar forma de pagamento" });
+    res.status(500).json({ message: "Erro ao atualizar forma de pagamento" });
   }
 };

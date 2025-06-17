@@ -14,16 +14,10 @@ exports.up = function(knex) {
   });
 };
 
-exports.down = function(knex) {
-  return knex.schema.dropTable('restaurante');
-};
-
-};
-
 /**
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-export function down(knex) {
+exports.down = function(knex) {
   return knex.schema.dropTable('restaurante');
 };

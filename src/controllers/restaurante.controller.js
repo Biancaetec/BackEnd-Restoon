@@ -37,7 +37,7 @@
 //       const { id } = req.params;
 //       const { nome, email, senha, criado_em, status_licenciamento } = req.body;
 //       // Aqui você poderia validar novamente se quiser, com RestauranteSchema.partial().parse({ ... })
-//       res.status(200).json({ message: `Restaurante ${id} atualizado com sucesso` });
+//       res.status(200).json({ message: Restaurante ${id} atualizado com sucesso });
 //     } catch (error) {
 //       res.status(500).send({ message: error.message });
 //     }
@@ -72,127 +72,107 @@
 
 // export default RestauranteController;
 
-import { z } from "zod";
 import {
-  findAll,
-  create,
-  update,
-  remove,
-  updateStatusLicenciamento,
+    findAll,
+    create,
+    remove,
+    update,
+    updateStatus, // nome ajustado para bater com o model
 } from "../models/restauranteModel.js";
+import { z } from "zod";
 
-// Validação do restaurante completo
+// Schema completo de restaurante
 const restauranteSchema = z.object({
-  nome: z.string().min(1, "Nome é obrigatório"),
-  email: z.string().email("Email inválido"),
-  senha: z.string().min(6, "A senha deve ter no mínimo 6 caracteres"),
-  criado_em: z
-    .string()
-    .refine((val) => !isNaN(Date.parse(val)), { message: "Data inválida" })
-    .transform((val) => new Date(val).toISOString()),
-  status_licenciamento: z.enum(["pendente", "aprovado", "rejeitado"]),
+    nome: z.string().min(1, "Nome é obrigatório"),
+    email: z.string().email("E-mail inválido"),
+    senha: z.string().min(1, "Senha é obrigatória"),
+    criado_em: z.string().optional(),
+    status_licenciamento: z.enum(["ativo", "expirado", "pendente"]).optional(),
+    id_usuario: z.number().int().positive().optional(),
 });
 
-// Validação específica para atualizar status
+// Apenas para atualização do status de licenciamento
 const statusSchema = z.object({
-  status_licenciamento: z.enum(["pendente", "aprovado", "rejeitado"]),
+    status_licenciamento: z.enum(["ativo", "expirado", "pendente"]),
 });
 
+// Validador de ID (parâmetro de rota)
+const idParamSchema = z.object({
+    id: z.string().regex(/^\d+$/, "ID inválido"),
+});
+
+// Buscar todos os restaurantes
 export const getRestaurantes = async (req, res) => {
-  try {
-    const data = await findAll();
-    res.status(200).json(data);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erro ao buscar restaurantes" });
-  }
+    try {
+        const restaurantes = await findAll();
+        res.status(200).json(restaurantes);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Erro ao buscar restaurantes" });
+    }
 };
 
+// Criar novo restaurante
 export const createRestaurante = async (req, res) => {
-  try {
-    const restauranteData = restauranteSchema.parse(req.body);
-    const novoRestaurante = await create(restauranteData);
-    res.status(201).json({
-      message: "Restaurante criado com sucesso",
-      restaurante: novoRestaurante,
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        message: "Erro de validação",
-        errors: error.errors.map((err) => ({
-          atributo: err.path[0],
-          mensagem: err.message,
-        })),
-      });
+    try {
+        const data = restauranteSchema.parse(req.body);
+        const result = await create(data);
+        res.status(201).json({
+            message: "Restaurante criado com sucesso",
+            restauranteId: result.lastInsertRowid,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({
+            message: "Erro ao criar restaurante",
+            error: error.errors ?? error.message,
+        });
     }
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao criar restaurante" });
-  }
 };
 
-export const updateRestaurante = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const restauranteData = restauranteSchema.parse(req.body);
-    const result = await update(id, restauranteData);
-    if (result.changes === 0) {
-      return res.status(404).json({ message: "Restaurante não encontrado" });
-    }
-    res.status(200).json({ message: "Restaurante atualizado com sucesso" });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        message: "Erro de validação",
-        errors: error.errors.map((err) => ({
-          atributo: err.path[0],
-          mensagem: err.message,
-        })),
-      });
-    }
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao atualizar restaurante" });
-  }
-};
-
+// Deletar restaurante
 export const deleteRestaurante = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const result = await remove(id);
-    if (result.changes === 0) {
-      return res.status(404).json({ message: "Restaurante não encontrado" });
+    try {
+        const { id } = idParamSchema.parse(req.params);
+        const result = await remove(id);
+        if (result.changes === 0) {
+            return res.status(404).json({ message: "Restaurante não encontrado" });
+        }
+        res.status(200).json({ message: "Restaurante deletado com sucesso" });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: "Erro ao deletar restaurante", error: error.errors ?? error.message });
     }
-    res.status(200).json({ message: "Restaurante deletado com sucesso" });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erro ao deletar restaurante" });
-  }
 };
 
+// Atualizar dados do restaurante
+export const updateRestaurante = async (req, res) => {
+    try {
+        const { id } = idParamSchema.parse(req.params);
+        const data = restauranteSchema.parse(req.body);
+        const result = await update(id, data);
+        if (result.changes === 0) {
+            return res.status(404).json({ message: "Restaurante não encontrado" });
+        }
+        res.status(200).json({ message: "Restaurante atualizado com sucesso" });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: "Erro ao atualizar restaurante", error: error.errors ?? error.message });
+    }
+};
+
+// Atualizar apenas o status de licenciamento
 export const updateRestauranteStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status_licenciamento } = statusSchema.parse(req.body);
-    const result = await updateStatusLicenciamento(id, status_licenciamento);
-    if (result.changes === 0) {
-      return res.status(404).json({ message: "Restaurante não encontrado" });
+    try {
+        const { id } = idParamSchema.parse(req.params);
+        const { status_licenciamento } = statusSchema.parse(req.body);
+        const result = await updateStatus(id, status_licenciamento);
+        if (result.changes === 0) {
+            return res.status(404).json({ message: "Restaurante não encontrado" });
+        }
+        res.status(200).json({ message: "Status de licenciamento atualizado com sucesso" });
+    } catch (error) {
+        console.error(error);
+        res.status(400).json({ message: "Erro ao atualizar status", error: error.errors ?? error.message });
     }
-    res
-      .status(200)
-      .json({ message: "Status de licenciamento atualizado com sucesso" });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        message: "Erro de validação",
-        errors: error.errors.map((err) => ({
-          atributo: err.path[0],
-          mensagem: err.message,
-        })),
-      });
-    }
-    console.error(error);
-    res
-      .status(500)
-      .json({ message: "Erro ao atualizar status de licenciamento" });
-  }
 };

@@ -1,10 +1,11 @@
+// src/routes/formaPagamento.routes.js
 import express from 'express';
 const router = express.Router();
 
-import FormaPagamentoController from '../controllers/formapagamento.controller.js';
+import { create, get, update } from '../controllers/formapagamento.controller.js';
 
-router.post('/formadepagamento', FormaPagamentoController.create);
-router.get('/formadepagamento', FormaPagamentoController.get);
-router.patch('/formadepagamento/:id', FormaPagamentoController.update);
+router.post('/formadepagamento', create);
+router.get('/formadepagamento', get);
+router.patch('/formadepagamento/:id', update);
 
 export default router;

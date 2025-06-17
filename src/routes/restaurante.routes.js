@@ -1,18 +1,28 @@
 import express from 'express';
+import {
+  getRestaurantes,
+  createRestaurante,
+  updateRestaurante,
+  deleteRestaurante,
+  updateRestauranteStatus,
+} from '../controllers/restaurante.controller.js';
+
 const router = express.Router();
 
-import {
-    getRestaurantes,
-    createRestaurante,
-    deleteRestaurante,
-    updateRestaurante,
-    updateRestauranteStatus
-} from "../controllers/restaurante.controller.js";
-
+// Listar todos os restaurantes
 router.get('/restaurante', getRestaurantes);
+
+// Criar novo restaurante
 router.post('/restaurante', createRestaurante);
+
+// Atualizar restaurante
+router.put('/restaurante/:id', updateRestaurante);
+
+// Atualizar status do licenciamento
+router.patch('/restaurante/:id/status', updateRestauranteStatus);
+
+// Deletar restaurante
 router.delete('/restaurante/:id', deleteRestaurante);
-router.patch('/restaurante/:id', updateRestaurante);
-router.patch('/restaurante/status/:id', updateRestauranteStatus);
 
 export default router;
+

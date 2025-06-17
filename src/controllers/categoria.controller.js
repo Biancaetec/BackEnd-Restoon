@@ -43,7 +43,7 @@
 //  },
 //};
 
-//export default CategoriaController;
+// src/controllers/categoria.controller.js
 import { z } from "zod";
 
 // Schema de validação
@@ -71,10 +71,6 @@ export const getCategorias = async (req, res) => {
 export const createCategoria = async (req, res) => {
   try {
     const categoriaData = categoriaSchema.parse(req.body);
-    
-    // Simulação de criação (substituir pelo banco depois)
-    // const result = await createCategoriaNoBanco(categoriaData);
-
     res.status(201).json({ message: "Categoria criada com sucesso", categoria: categoriaData });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -88,15 +84,11 @@ export const createCategoria = async (req, res) => {
   }
 };
 
-// Função para atualizar categoria
+// Atualizar categoria
 export const updateCategoria = async (req, res) => {
   try {
     const { id_categoria } = req.params;
     const categoriaData = categoriaSchema.partial().parse(req.body);
-
-    // Simulação de atualização (substituir pelo banco depois)
-    // const result = await updateCategoriaNoBanco(id_categoria, categoriaData);
-
     res.status(200).json({ message: `Categoria ${id_categoria} atualizada com sucesso` });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -110,18 +102,10 @@ export const updateCategoria = async (req, res) => {
   }
 };
 
-// Função para deletar categoria (opcional, mas seguindo o padrão do UserController)
+// Deletar categoria
 export const deleteCategoria = async (req, res) => {
   try {
     const { id_categoria } = req.params;
-
-    // Simulação de exclusão (substituir pelo banco depois)
-    // const result = await deleteCategoriaDoBanco(id_categoria);
-
-    // if (result.changes === 0) {
-    //   return res.status(404).json({ message: "Categoria não encontrada" });
-    // }
-
     res.status(200).json({ message: `Categoria ${id_categoria} deletada com sucesso` });
   } catch (error) {
     console.error(error);
