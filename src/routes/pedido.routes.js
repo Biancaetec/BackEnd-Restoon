@@ -1,10 +1,17 @@
-import express from 'express';
+import express from "express";
 const router = express.Router();
 
-import PedidoController from '../controllers/pedido.controller.js';
+import {
+  createPedido,
+  getPedidos,
+  updatePedido,
+  deletePedido,
+} from "../controllers/pedido.controller.js";
 
-router.post('/pedido', PedidoController.create);
-router.get('/pedido', PedidoController.get);
-router.patch('/pedido/:id', PedidoController.update);
+// Rotas de Pedido
+router.post("/pedido", createPedido);
+router.get("/pedido", getPedidos);
+router.patch("/pedido/:id_pedido", updatePedido);
+router.delete("/pedido/:id_pedido", deletePedido);
 
 export default router;

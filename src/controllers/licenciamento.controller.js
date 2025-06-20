@@ -1,6 +1,8 @@
 import { z } from "zod";
+import { findAll, create, update, remove } from "../models/licenciamentoModel.js"; // ajuste o caminho conforme necessário
 
-const LicenciamentoSchema = z.object({
+// Schema de validação
+const licenciamentoSchema = z.object({
   id_licenciamento: z.number().int().positive().optional(),
   id_restaurante: z.number().int().positive(),
   data_inicio: z.string().refine(date => !isNaN(Date.parse(date)), { message: "Data inválida" }),
@@ -10,57 +12,68 @@ const LicenciamentoSchema = z.object({
   tipo: z.enum(["gratuito", "mensal", "anual"]),
 });
 
-const LicenciamentoController = {
-  async create(req, res) {
-    try {
-      LicenciamentoSchema.parse(req.body);
-      res.status(201).json({ message: "Licenciamento criado com sucesso" });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({
-          message: "Erro de validação",
-          errors: error.errors.map(e => ({ atributo: e.path[0], mensagem: e.message })),
-        });
-      }
-      res.status(500).send({ message: error.message });
-    }
-  },
-  async update(req, res) {
-    try {
-      const { id_licenciamento } = req.params;
-      LicenciamentoSchema.partial().parse(req.body);
-      res.status(200).json({ message: `Licenciamento ${id_licenciamento} atualizado com sucesso` });
-    } catch (error) {
-      res.status(500).send({ message: error.message });
-    }
-  },
-  async get(req, res) {
-    try {
-      const data = [
-        {
-          id_licenciamento: 1,
-          id_restaurante: 1,
-          data_inicio: "2025-01-01",
-          data_fim: "2025-12-31",
-          status: "ativo",
-          valor: 0,
-          tipo: "gratuito",
-        },
-        {
-          id_licenciamento: 2,
-          id_restaurante: 2,
-          data_inicio: "2025-02-01",
-          data_fim: "2026-01-31",
-          status: "pendente",
-          valor: 500.0,
-          tipo: "anual",
-        },
-      ];
-      res.status(200).json({ data, message: "Licenciamentos listados com sucesso" });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
+// Listar todos os licenciamentos
+export const getLicenciamentos = async (req, res) => {
+  try {
+    const licenciamentos = await findAll();
+    res.status(200).json(licenciamentos);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro interno ao listar licenciamentos" });
+  }
 };
 
-export default LicenciamentoController;
+// Criar novo licenciamento
+export const createLicenciamento = async (req, res) => {
+  try {
+    const licenciamentoData = licenciamentoSchema.parse(req.body);
+    await create(licenciamentoData);
+    res.status(201).json({ message: "Licenciamento criado com sucesso" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: "Erro de validação",
+        errors: error.errors.map(e => ({
+          atributo: e.path[0],
+          mensagem: e.message,
+        })),
+      });
+    }
+    console.error(error);
+    res.status(500).json({ message: "Erro interno ao criar licenciamento" });
+  }
+};
+
+// Atualizar licenciamento existente
+export const updateLicenciamento = async (req, res) => {
+  try {
+    const { id_licenciamento } = req.params;
+    const licenciamentoData = licenciamentoSchema.partial().parse(req.body);
+    await update(id_licenciamento, licenciamentoData);
+    res.status(200).json({ message: `Licenciamento ${id_licenciamento} atualizado com sucesso` });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: "Erro de validação",
+        errors: error.errors.map(e => ({
+          atributo: e.path[0],
+          mensagem: e.message,
+        })),
+      });
+    }
+    console.error(error);
+    res.status(500).json({ message: "Erro interno ao atualizar licenciamento" });
+  }
+};
+
+// Deletar licenciamento
+export const deleteLicenciamento = async (req, res) => {
+  try {
+    const { id_licenciamento } = req.params;
+    await remove(id_licenciamento);
+    res.status(200).json({ message: `Licenciamento ${id_licenciamento} deletado com sucesso` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro interno ao deletar licenciamento" });
+  }
+};

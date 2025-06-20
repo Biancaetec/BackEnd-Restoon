@@ -65,6 +65,7 @@
 
 // export default UsuarioController;
 
+
 import { z } from "zod";
 import { findAll, create, remove, update, updateFuncao } from "../models/usuario.model.js";
 

@@ -61,37 +61,73 @@
 
 // Exemplo simples, adapte a lógica conforme seu banco ou regras
 
-export const create = async (req, res) => {
+import { z } from "zod";
+import { findAll, create, update, remove } from "../models/formapagamentoModel.js";
+
+// Schema de validação Zod
+const FormaPagamentoSchema = z.object({
+  id_pagamento: z.number().int().positive().optional(),
+  descricao: z.string().min(1, "Descrição é obrigatória"),
+  id_restaurante: z.number().int().positive({ message: "ID do restaurante deve ser positivo" }),
+  ativo: z.boolean()
+});
+
+// GET - Buscar todas as formas de pagamento
+export const getFormasPagamento = async (req, res) => {
   try {
-    // lógica para criar forma de pagamento
-    const data = req.body;
-    // simula inserção no banco
-    res.status(201).json({ message: "Forma de pagamento criada", data });
+    const formasPagamento = await findAll();
+    res.status(200).json(formasPagamento);
   } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro ao listar formas de pagamento" });
+  }
+};
+
+// POST - Criar nova forma de pagamento
+export const createFormaPagamento = async (req, res) => {
+  try {
+    const data = FormaPagamentoSchema.parse(req.body);
+    await create(data);
+    res.status(201).json({ message: "Forma de pagamento criada com sucesso" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: "Erro de validação",
+        errors: error.errors.map(e => ({ atributo: e.path[0], mensagem: e.message }))
+      });
+    }
+    console.error(error);
     res.status(500).json({ message: "Erro ao criar forma de pagamento" });
   }
 };
 
-export const get = async (req, res) => {
+// PUT - Atualizar forma de pagamento
+export const updateFormaPagamento = async (req, res) => {
   try {
-    // simula busca no banco
-    const formasPagamento = [
-      { id: 1, nome: "Cartão de Crédito" },
-      { id: 2, nome: "Dinheiro" },
-    ];
-    res.status(200).json(formasPagamento);
+    const { id_pagamento } = req.params;
+    const data = FormaPagamentoSchema.partial().parse(req.body);
+    await update(id_pagamento, data);
+    res.status(200).json({ message: `Forma de pagamento ${id_pagamento} atualizada com sucesso` });
   } catch (error) {
-    res.status(500).json({ message: "Erro ao buscar formas de pagamento" });
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: "Erro de validação",
+        errors: error.errors.map(e => ({ atributo: e.path[0], mensagem: e.message }))
+      });
+    }
+    console.error(error);
+    res.status(500).json({ message: "Erro ao atualizar forma de pagamento" });
   }
 };
 
-export const update = async (req, res) => {
+// DELETE - Remover forma de pagamento
+export const deleteFormaPagamento = async (req, res) => {
   try {
-    const { id } = req.params;
-    const dadosAtualizados = req.body;
-    // simula update no banco
-    res.status(200).json({ message: `Forma de pagamento ${id} atualizada`, dadosAtualizados });
+    const { id_pagamento } = req.params;
+    await remove(id_pagamento);
+    res.status(200).json({ message: `Forma de pagamento ${id_pagamento} deletada com sucesso` });
   } catch (error) {
-    res.status(500).json({ message: "Erro ao atualizar forma de pagamento" });
+    console.error(error);
+    res.status(500).json({ message: "Erro ao deletar forma de pagamento" });
   }
 };

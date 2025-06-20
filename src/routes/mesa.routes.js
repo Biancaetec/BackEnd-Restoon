@@ -1,10 +1,18 @@
 import express from 'express';
 const router = express.Router();
 
-import MesaController from '../controllers/mesa.controller.js';
+// Controllers - Mesa
+import {
+  createMesa,
+  getMesas,
+  updateMesa,
+  deleteMesa,
+} from "../controllers/mesa.controller.js";
 
-router.post('/mesa', MesaController.create);
-router.get('/mesa', MesaController.get);
-router.patch('/mesa/:id', MesaController.update);
+// Rotas de Mesa
+router.post('/mesa', createMesa);
+router.get('/mesa', getMesas);
+router.patch('/mesa/:id_mesa', updateMesa);
+router.delete('/mesa/:id_mesa', deleteMesa);
 
 export default router;

@@ -1,10 +1,16 @@
 import express from 'express';
 const router = express.Router();
 
-import LicenciamentoController from '../controllers/licenciamento.controller.js';
+import { 
+  getLicenciamentos, 
+  createLicenciamento, 
+  updateLicenciamento, 
+  deleteLicenciamento 
+} from "../controllers/licenciamento.controller.js";
 
-router.post('/licenciamento', LicenciamentoController.create);
-router.get('/licenciamento', LicenciamentoController.get);
-router.patch('/licenciamento/:id', LicenciamentoController.update);
+router.post('/licenciamento', createLicenciamento);
+router.get('/licenciamento', getLicenciamentos);
+router.patch('/licenciamento/:id_licenciamento', updateLicenciamento);
+router.delete('/licenciamento/:id_licenciamento', deleteLicenciamento);
 
 export default router;

@@ -1,62 +1,73 @@
 import { z } from "zod";
+import { findAll, create, update, remove } from "../models/mesaModel.js";
 
-const MesaSchema = z.object({
+// Schema de validação
+const mesaSchema = z.object({
   id_mesa: z.number().int().positive().optional(),
-  numero: z.number().int().positive(),
-  descricao: z.string(),
-  id_restaurante: z.number().int().positive(),
+  numero: z.number().int().positive("Número da mesa deve ser positivo"),
+  descricao: z.string().min(1, "Descrição é obrigatória"),
+  id_restaurante: z.number().int().positive("ID do restaurante inválido"),
   ocupada: z.boolean(),
 });
 
-const MesaController = {
-  async create(req, res) {
-    try {
-      MesaSchema.parse(req.body);
-      res.status(201).json({ message: "Mesa criada com sucesso" });
-    } catch (error) {
-      if (error instanceof z.ZodError) {
-        return res.status(400).json({
-          message: "Erro de validação",
-          errors: error.errors.map(e => ({ atributo: e.path[0], mensagem: e.message })),
-        });
-      }
-      res.status(500).send({ message: error.message });
-    }
-  },
-
-  async update(req, res) {
-    try {
-      const { id_mesa } = req.params;
-      MesaSchema.partial().parse(req.body);
-      res.status(200).json({ message: `Mesa ${id_mesa} atualizada com sucesso` });
-    } catch (error) {
-      res.status(500).send({ message: error.message });
-    }
-  },
-
-  async get(req, res) {
-    try {
-      const data = [
-        {
-          id_mesa: 1,
-          numero: 1,
-          descricao: "Mesa próxima à janela",
-          id_restaurante: 1,
-          ocupada: false,
-        },
-        {
-          id_mesa: 2,
-          numero: 2,
-          descricao: "Mesa do canto",
-          id_restaurante: 1,
-          ocupada: true,
-        },
-      ];
-      res.status(200).json({ data, message: "Mesas listadas com sucesso" });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  },
+export const getMesas = async (req, res) => {
+  try {
+    const mesas = await findAll();
+    res.status(200).json(mesas);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro interno ao listar mesas" });
+  }
 };
 
-export default MesaController;
+export const createMesa = async (req, res) => {
+  try {
+    const mesaData = mesaSchema.parse(req.body);
+    await create(mesaData);
+    res.status(201).json({ message: "Mesa criada com sucesso" });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: "Erro de validação",
+        errors: error.errors.map(e => ({
+          atributo: e.path[0],
+          mensagem: e.message,
+        })),
+      });
+    }
+    console.error(error);
+    res.status(500).json({ message: "Erro interno ao criar mesa" });
+  }
+};
+
+export const updateMesa = async (req, res) => {
+  try {
+    const { id_mesa } = req.params;
+    const mesaData = mesaSchema.partial().parse(req.body);
+    await update(id_mesa, mesaData);
+    res.status(200).json({ message: `Mesa ${id_mesa} atualizada com sucesso` });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: "Erro de validação",
+        errors: error.errors.map(e => ({
+          atributo: e.path[0],
+          mensagem: e.message,
+        })),
+      });
+    }
+    console.error(error);
+    res.status(500).json({ message: "Erro interno ao atualizar mesa" });
+  }
+};
+
+export const deleteMesa = async (req, res) => {
+  try {
+    const { id_mesa } = req.params;
+    await remove(id_mesa);
+    res.status(200).json({ message: `Mesa ${id_mesa} deletada com sucesso` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Erro interno ao deletar mesa" });
+  }
+};
