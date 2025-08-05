@@ -1,5 +1,6 @@
 import express from 'express';
 import router from './routes/index.js'; // Importando as rotas principais
+import cors from 'cors';
 
 const server = express();
 const PORT = process.env.PORT || 3001;
@@ -20,3 +21,6 @@ server.get("/", (req, res) => {
 server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+
+
+server.use(cors());  // Permite requisições de qualquer origem
