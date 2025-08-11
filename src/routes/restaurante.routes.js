@@ -8,6 +8,9 @@ import {
 } from '../controllers/restaurante.controller.js';
 
 const router = express.Router();
+import { login } from '../controllers/restaurante.controller.js';
+
+router.post('/login', login);
 
 // Listar todos os restaurantes
 router.get('/restaurante', getRestaurantes);

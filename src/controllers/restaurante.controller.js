@@ -80,6 +80,29 @@ import {
     updateStatus, // nome ajustado para bater com o model
 } from "../models/restauranteModel.js";
 import { z } from "zod";
+import { findByEmailAndSenha } from "../models/restauranteModel.js";
+
+export const login = async (req, res) => {
+  const { email, senha } = req.body;
+
+  if (!email || !senha) {
+    return res.status(400).json({ message: "Email e senha são obrigatórios" });
+  }
+
+  try {
+    const restaurante = await findByEmailAndSenha(email, senha);
+
+    if (!restaurante) {
+      return res.status(401).json({ message: "Email ou senha inválidos" });
+    }
+
+    return res.status(200).json(restaurante);
+
+  } catch (error) {
+    console.error("Erro no login:", error);
+    return res.status(500).json({ message: "Erro interno no servidor" });
+  }
+};
 
 // Schema completo de restaurante
 const restauranteSchema = z.object({

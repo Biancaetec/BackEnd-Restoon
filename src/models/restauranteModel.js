@@ -93,3 +93,19 @@ export async function updateStatus(id_restaurante, status) {
     throw new Error("Erro ao atualizar status de licenciamento: " + error.message);
   }
 }
+// Buscar restaurante por email e senha (para login)
+export async function findByEmailAndSenha(email, senha) {
+  try {
+    const db = await connectDB();
+    const query = `
+      SELECT id_restaurante, id_usuario, nome, email, criado_em, status_licenciamento
+      FROM restaurante
+      WHERE email = ? AND senha = ?;
+    `;
+    const restaurante = await db.get(query, [email, senha]);
+    return restaurante || null;
+  } catch (error) {
+    console.error("Erro ao buscar restaurante por email e senha:", error);
+    throw new Error("Erro ao buscar restaurante");
+  }
+}

@@ -13,7 +13,9 @@ import mesaRoutes from './mesa.routes.js';
 import pedidoRoutes from './pedido.routes.js';
 import itemPedidoRoutes from './itemPedido.routes.js';
 import pedidoPagamentoRoutes from './pedidoPagamento.routes.js';
+// import authRoutes from './auth.routes.js';
 
+// router.use('/api', authRoutes);
 router.use('/api',paymentRoutes);
 router.use('/api', userRoutes);
 router.use('/api', restauranteRoutes);
