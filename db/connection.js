@@ -4,7 +4,7 @@ import { open } from 'sqlite';
 import { dbPath } from '../src/utils/dbpath.js';
 
 export const connectDB = async () => {
-  try {
+  try { 
     const db = await open({
       filename: dbPath,
       driver: sqlite3.Database,
