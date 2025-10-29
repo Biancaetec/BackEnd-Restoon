@@ -1,12 +1,17 @@
-import { connectDB } from '../../db/connection.js';
+import connectDB from "../../db/connection.js";
 
 // Buscar todos os usuários
 export async function findAll() {
   try {
-    const db = await connectDB();
-    const query = `SELECT * FROM usuario;`;
-    const usuarios = await db.all(query);
-    return usuarios;
+    // const db = await connectDB();
+    // const query = `SELECT * FROM usuario;`;
+    // const usuarios = await db.all(query);
+    // return usuarios;
+    const query = "SELECT id, username, email, photo from users;";
+    const statement = connectDB.prepare(query);
+    const users = statement.all();
+    //statement.finalize();
+    return users;
   } catch (error) {
     console.error(error);
     throw new Error("Erro ao buscar usuários: " + error.message);
@@ -41,7 +46,9 @@ export async function create(userData) {
 export async function remove(id) {
   try {
     const db = await connectDB();
-    const result = await db.run("DELETE FROM usuario WHERE id_usuario = ?", [id]);
+    const result = await db.run("DELETE FROM usuario WHERE id_usuario = ?", [
+      id,
+    ]);
 
     if (result.changes === 0) {
       throw new Error("Usuário não encontrado");
@@ -70,7 +77,7 @@ export async function update(id, usuarioData) {
       usuarioData.funcao,
       usuarioData.id_restaurante,
       usuarioData.ativo,
-      id
+      id,
     ]);
     return result;
   } catch (error) {

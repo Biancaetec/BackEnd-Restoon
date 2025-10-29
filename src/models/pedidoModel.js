@@ -1,4 +1,5 @@
-import { connectDB } from "../../db/connection.js";
+// import { connectDB } from '../../db/connection.js';
+import  connectDB  from '../../db/connection.js';
 
 // Buscar todos os pedidos
 export async function findAll() {

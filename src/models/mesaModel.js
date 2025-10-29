@@ -1,4 +1,5 @@
-import { connectDB } from '../../db/connection.js';
+// import { connectDB } from '../../db/connection.js';
+import  connectDB  from '../../db/connection.js';
 
 // Buscar todas as mesas
 export async function findAll() {

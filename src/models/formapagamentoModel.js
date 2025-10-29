@@ -1,5 +1,5 @@
-import { connectDB } from '../../db/connection.js';
-
+// import { connectDB } from '../../db/connection.js';
+import  connectDB  from '../../db/connection.js';
 // Buscar todas as formas de pagamento
 export async function findAll() {
   try {
