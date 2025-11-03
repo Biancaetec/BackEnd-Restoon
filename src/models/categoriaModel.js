@@ -17,7 +17,7 @@ export async function findAll() {
 // Criar nova categoria
 export async function create(categoriaData) {
   try {
-    const db = await connectDB();
+    // const db = await connectDB();
     const query = "INSERT INTO categoria (nome, id_restaurante) VALUES (?, ?);";
     const result = await db.run(query, categoriaData.nome, categoriaData.id_restaurante);
     return result;

@@ -1,5 +1,5 @@
 // import { connectDB } from '../../db/connection.js';
-import  connectDB  from '../../db/connection.js';
+import connectDB from '../../db/connection.js';
 
 // Buscar todos os restaurantes
 export async function findAll() {
@@ -17,22 +17,22 @@ export async function findAll() {
 // Criar novo restaurante
 export async function create(data) {
   try {
-    const db = await connectDB();
+    // const db = await connectDB();
     const query = `
-      INSERT INTO restaurante (id_usuario, nome, email, senha, criado_em, status_licenciamento)
-      VALUES (?, ?, ?, ?, ?, ?);
+      INSERT INTO restaurante (id_usuario, nome, email, senha, status_licenciamento)
+      VALUES (?, ?, ?, ?, ?);
     `;
-    const result = await db.run(
-      query,
+
+    console.table(data);
+    const insert = connectDB.prepare(query);
+    const result = await insert.run(
       data.id_usuario,
       data.nome,
       data.email,
       data.senha,
-      data.criado_em,
       data.status_licenciamento
-    );
-
-    const novoRestaurante = await db.get("SELECT * FROM restaurante WHERE id_restaurante = ?", result.lastID);
+    )
+    const novoRestaurante = await connectDB.prepare("SELECT * FROM restaurante WHERE id_restaurante = ?", result.lastID).all();
     return novoRestaurante;
   } catch (error) {
     console.error(error);
@@ -97,14 +97,16 @@ export async function updateStatus(id_restaurante, status) {
 // Buscar restaurante por email e senha (para login)
 export async function findByEmailAndSenha(email, senha) {
   try {
-    const db = await connectDB();
-    const query = `
+    // const db = await connectDB();
+    const sqlQuery = `
       SELECT id_restaurante, id_usuario, nome, email, criado_em, status_licenciamento
       FROM restaurante
       WHERE email = ? AND senha = ?;
     `;
-    const restaurante = await db.get(query, [email, senha]);
-    return restaurante || null;
+    const query = connectDB.prepare(sqlQuery);
+    const result = await query.get(email, senha);
+    // const restaurante = await db.get(query, [email, senha]);
+    return result || null;
   } catch (error) {
     console.error("Erro ao buscar restaurante por email e senha:", error);
     throw new Error("Erro ao buscar restaurante");

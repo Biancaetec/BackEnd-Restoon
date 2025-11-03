@@ -9,7 +9,7 @@ export function up(knex) {
     table.text('descricao').notNullable();
     table.decimal('preco', 10, 2).notNullable();
     table.string('tipo_preparo').notNullable(); 
-    table
+    tables
       .integer('id_categoria')
       .unsigned()
       .references('id_categoria')

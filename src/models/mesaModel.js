@@ -4,10 +4,12 @@ import  connectDB  from '../../db/connection.js';
 // Buscar todas as mesas
 export async function findAll() {
   try {
-    const db = await connectDB();
-    const query = "SELECT id_mesa, numero, descricao, id_restaurante, ocupada FROM mesa;";
-    const mesas = await db.all(query);
-    return mesas;
+    // const db = await connectDB();
+    const sqlQuery = "SELECT id_mesa, numero, descricao, id_restaurante, ocupada FROM mesa WHERE id_restaurante = ?;";
+    //const mesas = await db.all(query);
+    const query = connectDB.prepare(sqlQuery);
+    const result = await query.all(1); // Substitua 1 pelo id_usuario desejado
+    return result;
   } catch (error) {
     console.error(error);
     throw new Error("Erro ao buscar mesas: " + error.message);
