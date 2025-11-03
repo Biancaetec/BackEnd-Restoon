@@ -19,19 +19,20 @@ export async function findAll() {
 // Criar nova mesa
 export async function create(mesaData) {
   try {
-    const db = await connectDB();
-    const query = `
-      INSERT INTO mesa (numero, descricao, id_restaurante, ocupada)
-      VALUES (?, ?, ?, ?);
-    `;
-    const result = await db.run(
-      query,
+    //const db = await connectDB();
+    const query = "INSERT INTO mesa (numero, descricao, id_restaurante, ocupada) VALUES (?, ?, ?, ?);";
+    const insert = connectDB.prepare(query);
+    const result = await insert.run(
       mesaData.numero,
       mesaData.descricao,
       mesaData.id_restaurante,
       mesaData.ocupada
     );
-    return result;
+    
+    const novaMesaQuery = connectDB.prepare("SELECT * FROM mesa WHERE id_mesa = ?");
+    const novaMesa = await novaMesaQuery.get(result.lastInsertRowid);
+    
+    return novaMesa;
   } catch (error) {
     console.error(error);
     throw new Error("Erro ao criar mesa: " + error.message);
@@ -41,15 +42,17 @@ export async function create(mesaData) {
 // Atualizar mesa existente
 export async function update(id_mesa, mesaData) {
   try {
-    const db = await connectDB();
-    const query = `
-      UPDATE mesa SET
-        numero = COALESCE(?, numero),
-        descricao = COALESCE(?, descricao),
-        id_restaurante = COALESCE(?, id_restaurante),
-        ocupada = COALESCE(?, ocupada)
-      WHERE id_mesa = ?;
-    `;
+    const query = "UPDATE mesa SET numero = ?, descricao = ?, id_restaurante = ?, ocupada = ? WHERE id_mesa = ?;";
+    //const db = await connectDB();
+    //const query = `
+    //  UPDATE mesa SET
+    //    numero = COALESCE(?, numero),
+    //    descricao = COALESCE(?, descricao),
+    //    id_restaurante = COALESCE(?, id_restaurante),
+    //    ocupada = COALESCE(?, ocupada)
+    //  WHERE id_mesa = ?;
+    //`;
+    const update = connectDB.prepare(query);
     const result = await db.run(
       query,
       mesaData.numero,
@@ -68,9 +71,10 @@ export async function update(id_mesa, mesaData) {
 // Remover mesa
 export async function remove(id_mesa) {
   try {
-    const db = await connectDB();
+    //const db = await connectDB();
     const query = "DELETE FROM mesa WHERE id_mesa = ?;";
-    const result = await db.run(query, id_mesa);
+    const remove = connectDB.prepare(query);
+    const result = await remove.run(query, id_mesa);
     if (result.changes === 0) {
       throw new Error("Mesa não encontrada");
     }
