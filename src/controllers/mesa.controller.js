@@ -10,18 +10,35 @@ const mesaSchema = z.object({
   ocupada: z.boolean(),
 });
 
-export const getMesas = async (req, res) => {
-  try {
-    const mesas = await findAll();
-    res.status(200).json(mesas);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao listar mesas" });
-  }
-};
+// export const getMesas = async (req, res) => {
+//   try {
+//     const mesas = await findAll();
+//     res.status(200).json(mesas);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: "Erro interno ao listar mesas" });
+//   }
+// };
 
+export async function getMesas(req, res) {
+  try {
+    const { id_restaurante } = req.query;
+    if (!id_restaurante) {
+      return res.status(400).json({ error: "id_restaurante é obrigatório" });
+    }
+
+    const mesas = await findAll(id_restaurante);
+
+    res.json(mesas);
+  } catch (error) {
+    console.error("Erro ao listar mesas:", error);
+    res.status(500).json({ error: "Erro ao listar mesas" });
+  }
+}
 export const createMesa = async (req, res) => {
   try {
+    console.log("📋 Dados recebidos:", req.body);
+
     const mesaData = mesaSchema.parse(req.body);
     await create(mesaData);
     res.status(201).json({ message: "Mesa criada com sucesso" });
