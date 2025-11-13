@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { Schema, z } from "zod";
 import { findAll, create, update, remove } from "../models/produtoModel.js";
 
 // Schema de validação
@@ -10,8 +10,10 @@ const produtoSchema = z.object({
   tipo_preparo: z.string().min(1, "Tipo de preparo é obrigatório"),
   id_categoria: z.number().int().positive("Categoria inválida"),
   id_restaurante: z.number().int().positive("Restaurante inválido"),
-  ativo: z.boolean(),
-  imagem: z.string().url("URL inválida").optional(),
+  ativo: z.union([z.literal(0), z.literal(1)], {
+    errorMap: () => ({ message: "O campo ativo deve ser 0 (falso) ou 1 (verdadeiro)" })
+  }),
+  imagem: z.string().url("URL inválida").nullable().optional(),
 });
 
 export const getProdutos = async (req, res) => {
@@ -27,6 +29,9 @@ export const getProdutos = async (req, res) => {
 export const createProduto = async (req, res) => {
   try {
     const produtoData = produtoSchema.parse(req.body);
+
+    console.log("Dados do produto recebidos pelo controller:", produtoData);
+
     await create(produtoData);
     res.status(201).json({ message: "Produto criado com sucesso" });
   } catch (error) {
@@ -44,8 +49,19 @@ export const createProduto = async (req, res) => {
 export const updateProduto = async (req, res) => {
   try {
     const { id_produto } = req.params;
-    const produtoData = produtoSchema.partial().parse(req.body);
-    await update(id_produto, produtoData);
+    const {nome, descricao, preco, id_categoria} = req.body.nome;
+
+    const dadosParaLog = {
+      id_produto: Number(id_produto), // Usa a variável id_produto
+      nome,
+      descricao, preco,
+      id_categoria, // Usa a variável produtoData (que contém req.body.nome)
+      id_restaurante: req.body.id_restaurante // Acessa o valor diretamente do req.body
+    };
+
+    // console.log("Controller:", dadosParaLog);
+    await produtoSchema.partial().parseAsync(dadosParaLog);
+    await update(id_produto, dadosParaLog);
     res.status(200).json({ message: `Produto ${id_produto} atualizado com sucesso` });
   } catch (error) {
     if (error instanceof z.ZodError) {
