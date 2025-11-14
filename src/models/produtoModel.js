@@ -73,6 +73,7 @@ export async function update(id_produto, produtoData) {
         nome = ?, 
         descricao = ?, 
         preco = ?, 
+        tipo_preparo = ?,
         id_categoria = ?, 
         id_restaurante = ? 
       WHERE id_produto = ?;
@@ -84,6 +85,7 @@ export async function update(id_produto, produtoData) {
       produtoData.nome,
       produtoData.descricao,
       Number(produtoData.preco),
+      produtoData.tipo_preparo,
       produtoData.id_categoria,
       produtoData.id_restaurante,
       id_produto

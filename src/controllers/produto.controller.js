@@ -49,31 +49,37 @@ export const createProduto = async (req, res) => {
 export const updateProduto = async (req, res) => {
   try {
     const { id_produto } = req.params;
-    const {nome, descricao, preco, id_categoria} = req.body.nome;
 
-    const dadosParaLog = {
-      id_produto: Number(id_produto), // Usa a variável id_produto
-      nome,
-      descricao, preco,
-      id_categoria, // Usa a variável produtoData (que contém req.body.nome)
-      id_restaurante: req.body.id_restaurante // Acessa o valor diretamente do req.body
+    const produtoData = {
+      id_produto: Number(id_produto),
+      nome: req.body.nome,
+      descricao: req.body.descricao,
+      preco: req.body.preco,
+      tipo_preparo: req.body.tipo_preparo,
+      id_categoria: req.body.id_categoria,
+      id_restaurante: req.body.id_restaurante,
+      imagem: req.body.imagem
     };
 
-    // console.log("Controller:", dadosParaLog);
-    await produtoSchema.partial().parseAsync(dadosParaLog);
-    await update(id_produto, dadosParaLog);
-    res.status(200).json({ message: `Produto ${id_produto} atualizado com sucesso` });
+    await produtoSchema.partial().parseAsync(produtoData);
+    await update(id_produto, produtoData);
+
+    res.status(200).json({ message: "Produto atualizado com sucesso" });
+
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
         message: "Erro de validação",
-        errors: error.errors.map(e => ({ atributo: e.path[0], mensagem: e.message })),
+        errors: error.errors.map(e => ({
+          atributo: e.path[0],
+          mensagem: e.message
+        })),
       });
     }
-    console.error(error);
     res.status(500).json({ message: "Erro interno ao atualizar produto" });
   }
 };
+
 
 export const deleteProduto = async (req, res) => {
   try {
