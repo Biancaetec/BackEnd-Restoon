@@ -49,7 +49,7 @@ export const createProduto = async (req, res) => {
 export const updateProduto = async (req, res) => {
   try {
     const { id_produto } = req.params;
-
+  
     const produtoData = {
       id_produto: Number(id_produto),
       nome: req.body.nome,
