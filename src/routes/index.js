@@ -13,6 +13,8 @@ import mesaRoutes from './mesa.routes.js';
 import pedidoRoutes from './pedido.routes.js';
 import itemPedidoRoutes from './itemPedido.routes.js';
 import pedidoPagamentoRoutes from './pedidoPagamento.routes.js';
+import pedidocompletoRoutes from './pedidocompleto.routes.js';
+
 // import authRoutes from './auth.routes.js';
 
 // router.use('/api', authRoutes);
@@ -28,5 +30,6 @@ router.use('/api', mesaRoutes);
 router.use('/api', pedidoRoutes);
 router.use('/api', itemPedidoRoutes);
 router.use('/api', pedidoPagamentoRoutes);
+router.use('/api', pedidocompletoRoutes);
 
 export default router;

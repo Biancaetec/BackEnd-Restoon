@@ -1,4 +1,3 @@
-// import { connectDB } from '../../db/connection.js';
 import  connectDB  from '../../db/connection.js';
 
 // Buscar todos os pedidos
@@ -7,7 +6,7 @@ export async function findAll() {
     const db = await connectDB();
     const query = `
       SELECT 
-        id_pedido, id_mesa, id_usuario, id_restaurante, status, tipo_preparo, 
+        id_pedido, id_mesa, id_usuario, status, tipo_preparo, 
         data_abertura, data_fechamento, valor_total, observacoes 
       FROM pedido;
     `;
@@ -25,14 +24,13 @@ export async function create(pedidoData) {
     const db = await connectDB();
     const query = `
       INSERT INTO pedido 
-        (id_mesa, id_usuario, id_restaurante, status, tipo_preparo, data_abertura, data_fechamento, valor_total, observacoes) 
+        (id_mesa, id_usuario, status, tipo_preparo, data_abertura, data_fechamento, valor_total, observacoes) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?);
     `;
     const result = await db.run(
       query,
       pedidoData.id_mesa,
       pedidoData.id_usuario,
-      pedidoData.id_restaurante,
       pedidoData.status,
       pedidoData.tipo_preparo || null,
       pedidoData.data_abertura || null,
