@@ -19,12 +19,24 @@ export function findById(id_pedido) {
 
     // Buscar itens
     const itensQuery = `
-      SELECT 
-        id_item, id_produto, quantidade, preco_unitario,
-        tipo_porção, status
-      FROM item_pedido
-      WHERE id_pedido = ?;
-    `;
+  SELECT 
+    ip.id_item,
+    ip.id_produto,
+    ip.quantidade,
+    ip.preco_unitario,
+    ip.tipo_porção,
+    ip.status,
+
+    p.nome AS nome_produto,
+    p.tipo_preparo AS tipo_preparo_produto,
+    c.nome AS nome_categoria
+
+  FROM item_pedido ip
+  INNER JOIN produto p ON p.id_produto = ip.id_produto
+  INNER JOIN categoria c ON c.id_categoria = p.id_categoria
+  WHERE ip.id_pedido = ?;
+`;
+
     const itens = db.prepare(itensQuery).all(id_pedido);
 
     return { ...pedido, itens };
@@ -138,12 +150,24 @@ export function findByRestaurante(id_restaurante) {
     const pedidos = db.prepare(pedidosQuery).all(id_restaurante);
 
     const itensQuery = `
-      SELECT 
-        id_item, id_produto, quantidade, preco_unitario,
-        tipo_porção, status
-      FROM item_pedido
-      WHERE id_pedido = ?;
-    `;
+  SELECT 
+    ip.id_item,
+    ip.id_produto,
+    ip.quantidade,
+    ip.preco_unitario,
+    ip.tipo_porção,
+    ip.status,
+
+    p.nome AS nome_produto,
+    p.tipo_preparo AS tipo_preparo_produto,
+    c.nome AS nome_categoria
+
+  FROM item_pedido ip
+  INNER JOIN produto p ON p.id_produto = ip.id_produto
+  INNER JOIN categoria c ON c.id_categoria = p.id_categoria
+  WHERE ip.id_pedido = ?;
+`;
+
 
     return pedidos.map(pedido => {
       const itens = db.prepare(itensQuery).all(pedido.id_pedido);
@@ -155,3 +179,139 @@ export function findByRestaurante(id_restaurante) {
     throw new Error("Erro ao listar pedidos completos: " + error.message);
   }
 }
+
+/* ===========================================================
+   Atualizar status
+=========================================================== */
+export function updateStatusPedido(id_pedido, novoStatus) {
+  try {
+    const stmt = db.prepare(`
+      UPDATE pedido 
+      SET status = ?
+      WHERE id_pedido = ?;
+    `);
+
+    const result = stmt.run(novoStatus, id_pedido);
+
+    if (result.changes === 0) {
+      throw new Error("Pedido não encontrado");
+    }
+
+    return findById(id_pedido);
+
+  } catch (error) {
+    console.error(error);
+    throw new Error("Erro ao atualizar status do pedido: " + error.message);
+  }
+}
+/* ===========================================================
+   Remover todos os pedidos de uma mesa
+=========================================================== */
+export function removePedidosPorMesa(id_mesa) {
+  try {
+    db.exec("BEGIN TRANSACTION;");
+
+    // Buscar pedidos da mesa
+    const pedidos = db.prepare("SELECT id_pedido FROM pedido WHERE id_mesa = ?;").all(id_mesa);
+
+    const deleteItem = db.prepare("DELETE FROM item_pedido WHERE id_pedido = ?;");
+
+    pedidos.forEach(p => deleteItem.run(p.id_pedido));
+
+    // Deletar os pedidos
+    db.prepare("DELETE FROM pedido WHERE id_mesa = ?;").run(id_mesa);
+
+    db.exec("COMMIT;");
+
+    return { sucesso: true };
+
+  } catch (error) {
+    db.exec("ROLLBACK;");
+    console.error(error);
+    throw new Error("Erro ao remover pedidos da mesa: " + error.message);
+  }
+}
+
+/* ===========================================================
+   Fila de preparo por categoria
+=========================================================== */
+export function findFilaByCategoria(id_categoria) {
+  try {
+    const query = `
+      SELECT 
+        ip.id_item,
+        ip.id_pedido,
+        ip.id_produto,
+        ip.quantidade,
+        ip.preco_unitario,
+        ip.tipo_porção,
+        ip.status,
+
+        p.nome AS nome_produto,
+        c.nome AS nome_categoria,
+
+        ped.id_mesa,
+        ped.observacoes
+
+      FROM item_pedido ip
+      INNER JOIN produto p ON p.id_produto = ip.id_produto
+      INNER JOIN categoria c ON c.id_categoria = p.id_categoria
+      INNER JOIN pedido ped ON ped.id_pedido = ip.id_pedido
+
+      WHERE c.id_categoria = ?
+      AND ip.status IN ('aguardando', 'em_preparo')
+
+      ORDER BY ped.data_abertura ASC;
+    `;
+
+    return db.prepare(query).all(id_categoria);
+
+  } catch (error) {
+    console.error(error);
+    throw new Error("Erro ao obter fila de preparo: " + error.message);
+  }
+}
+
+/* ===========================================================
+   Atualizar status de UM item do pedido
+=========================================================== */
+export function updateStatusItemPedido(id_item, novoStatus) {
+  try {
+    const stmt = db.prepare(`
+      UPDATE item_pedido
+      SET status = ?
+      WHERE id_item = ?;
+    `);
+
+    const result = stmt.run(novoStatus, id_item);
+
+    if (result.changes === 0) {
+      throw new Error("Item não encontrado");
+    }
+
+    // Retornar o item atualizado
+    const itemAtualizado = db.prepare(`
+      SELECT 
+        ip.id_item,
+        ip.id_pedido,
+        ip.id_produto,
+        ip.quantidade,
+        ip.preco_unitario,
+        ip.tipo_porção,
+        ip.status,
+        p.nome AS nome_produto,
+        c.nome AS nome_categoria
+      FROM item_pedido ip
+      INNER JOIN produto p ON p.id_produto = ip.id_produto
+      INNER JOIN categoria c ON c.id_categoria = p.id_categoria
+      WHERE ip.id_item = ?;
+    `).get(id_item);
+
+    return itemAtualizado;
+
+  } catch (error) {
+    console.error(error);
+    throw new Error("Erro ao atualizar status do item: " + error.message);
+  }
+}
+

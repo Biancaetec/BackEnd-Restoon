@@ -3,7 +3,10 @@ import {
   createPedidoCompleto,
   findById,
   removePedidoCompleto,
-  findByRestaurante
+  findByRestaurante,
+  updateStatusPedido,
+  removePedidosPorMesa,
+  updateStatusItemPedido
 } from "../models/pedidocompletoModel.js";
 
 // -----------------------------
@@ -138,3 +141,122 @@ export const listarPedidosCompleto = async (req, res) => {
     });
   }
 };
+// =======================================================
+// Atualizar apenas o status do pedido
+// =======================================================
+export const atualizarStatusPedido = async (req, res) => {
+  try {
+    const { id_pedido } = req.params;
+    const { status } = req.body;
+
+    // Validar status com zod
+    const statusSchema = z.enum(["pendente", "em_preparo", "entregue", "fechado"]);
+    const novoStatus = statusSchema.parse(status);
+
+    const pedidoAtualizado = await updateStatusPedido(id_pedido, novoStatus);
+
+    return res.status(200).json({
+      message: "Status do pedido atualizado com sucesso",
+      pedido: pedidoAtualizado
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: "Erro de validação",
+        errors: error.errors
+      });
+    }
+
+    return res.status(500).json({
+      message: "Erro interno ao atualizar status",
+      error: error.message
+    });
+  }
+};
+// =======================================================
+// Limpar todos os pedidos de uma mesa
+// =======================================================
+export const limparPedidosMesa = async (req, res) => {
+  try {
+    const { id_mesa } = req.params;
+
+    if (!id_mesa) {
+      return res.status(400).json({ message: "id_mesa é obrigatório" });
+    }
+
+    await removePedidosPorMesa(id_mesa);
+
+    return res.status(200).json({
+      message: `Todos os pedidos da mesa ${id_mesa} foram removidos`
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Erro interno ao limpar pedidos da mesa",
+      error: error.message
+    });
+  }
+};
+
+import { findFilaByCategoria } from "../models/pedidocompletoModel.js";
+
+export const getFilaPreparoPorCategoria = (req, res) => {
+  try {
+    const { id_categoria } = req.params;
+
+    if (!id_categoria) {
+      return res.status(400).json({ message: "id_categoria é obrigatório" });
+    }
+
+    const itens = findFilaByCategoria(id_categoria);
+
+    return res.status(200).json(itens);
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Erro ao buscar fila de preparo",
+      error: error.message
+    });
+  }
+};
+
+// =======================================================
+// Atualizar status de UM item do pedido
+// =======================================================
+export const atualizarStatusItemPedido = async (req, res) => {
+  try {
+    const { id_item } = req.params;
+    const { status } = req.body;
+
+    const statusSchema = z.enum(["aguardando", "em_preparo", "pronto", "entregue"]);
+    const novoStatus = statusSchema.parse(status);
+
+    const item = await updateStatusItemPedido(id_item, novoStatus);
+
+    return res.status(200).json({
+      message: "Status do item atualizado com sucesso",
+      item
+    });
+
+  } catch (error) {
+    console.error(error);
+
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        message: "Erro de validação",
+        errors: error.errors
+      });
+    }
+
+    return res.status(500).json({
+      message: "Erro interno ao atualizar status do item",
+      error: error.message
+    });
+  }
+};
+
