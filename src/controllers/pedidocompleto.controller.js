@@ -2,7 +2,8 @@ import { z } from "zod";
 import {
   createPedidoCompleto,
   findById,
-  removePedidoCompleto
+  removePedidoCompleto,
+  findByRestaurante
 } from "../models/pedidocompletoModel.js";
 
 // -----------------------------
@@ -107,6 +108,32 @@ export const deletePedidoCompleto = async (req, res) => {
 
     return res.status(500).json({
       message: "Erro interno ao deletar pedido completo",
+      error: error.message
+    });
+  }
+};
+
+// =======================================================
+// Listar todos os pedidos completos de um restaurante
+// =======================================================
+export const listarPedidosCompleto = async (req, res) => {
+  try {
+    const { id_restaurante } = req.query;
+
+    if (!id_restaurante) {
+      return res.status(400).json({
+        message: "id_restaurante é obrigatório na query"
+      });
+    }
+
+    const pedidos = await findByRestaurante(id_restaurante);
+
+    return res.status(200).json(pedidos);
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Erro interno ao listar pedidos",
       error: error.message
     });
   }

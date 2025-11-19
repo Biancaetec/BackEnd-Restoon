@@ -1,13 +1,10 @@
-import connectDB from '../../db/connection.js';
+import db from '../../db/connection.js';
 
 /* ===========================================================
    Buscar pedido completo por ID
-   (Pedido + itens)
 =========================================================== */
-export async function findById(id_pedido) {
+export function findById(id_pedido) {
   try {
-    const db = await connectDB();
-
     // Buscar pedido
     const pedidoQuery = `
       SELECT 
@@ -30,10 +27,7 @@ export async function findById(id_pedido) {
     `;
     const itens = db.prepare(itensQuery).all(id_pedido);
 
-    return {
-      ...pedido,
-      itens
-    };
+    return { ...pedido, itens };
 
   } catch (error) {
     console.error(error);
@@ -44,13 +38,10 @@ export async function findById(id_pedido) {
 /* ===========================================================
    Criar pedido + itens (transação)
 =========================================================== */
-export async function createPedidoCompleto(data) {
+export function createPedidoCompleto(data) {
   try {
-    const db = await connectDB();
-
     db.exec("BEGIN TRANSACTION;");
 
-    // Criar pedido
     const insertPedido = db.prepare(`
       INSERT INTO pedido (
         id_mesa, id_usuario, status, tipo_preparo,
@@ -72,7 +63,6 @@ export async function createPedidoCompleto(data) {
 
     const id_pedido = resultPedido.lastInsertRowid;
 
-    // Criar itens
     const insertItem = db.prepare(`
       INSERT INTO item_pedido (
         id_pedido, id_produto, quantidade,
@@ -94,7 +84,6 @@ export async function createPedidoCompleto(data) {
 
     db.exec("COMMIT;");
 
-    // Retornar pedido completo criado
     return findById(id_pedido);
 
   } catch (error) {
@@ -106,21 +95,14 @@ export async function createPedidoCompleto(data) {
 
 /* ===========================================================
    Remover pedido completo
-   (Pedido + Itens)
 =========================================================== */
-export async function removePedidoCompleto(id_pedido) {
+export function removePedidoCompleto(id_pedido) {
   try {
-    const db = await connectDB();
-
     db.exec("BEGIN TRANSACTION;");
 
-    // Remover itens
-    const deleteItensQuery = "DELETE FROM item_pedido WHERE id_pedido = ?;";
-    db.prepare(deleteItensQuery).run(id_pedido);
+    db.prepare("DELETE FROM item_pedido WHERE id_pedido = ?;").run(id_pedido);
 
-    // Remover pedido
-    const deletePedidoQuery = "DELETE FROM pedido WHERE id_pedido = ?;";
-    const result = db.prepare(deletePedidoQuery).run(id_pedido);
+    const result = db.prepare("DELETE FROM pedido WHERE id_pedido = ?;").run(id_pedido);
 
     if (result.changes === 0) {
       db.exec("ROLLBACK;");
@@ -135,5 +117,41 @@ export async function removePedidoCompleto(id_pedido) {
     console.error(error);
     db.exec("ROLLBACK;");
     throw new Error("Erro ao deletar pedido completo: " + error.message);
+  }
+}
+
+/* ===========================================================
+   Listar todos os pedidos completos de um restaurante
+=========================================================== */
+export function findByRestaurante(id_restaurante) {
+  try {
+    const pedidosQuery = `
+      SELECT 
+        p.id_pedido, p.id_mesa, p.id_usuario, p.status, p.tipo_preparo,
+        p.data_abertura, p.data_fechamento, p.valor_total, p.observacoes
+      FROM pedido p
+      INNER JOIN mesa m ON m.id_mesa = p.id_mesa
+      WHERE m.id_restaurante = ?
+      ORDER BY p.data_abertura DESC;
+    `;
+
+    const pedidos = db.prepare(pedidosQuery).all(id_restaurante);
+
+    const itensQuery = `
+      SELECT 
+        id_item, id_produto, quantidade, preco_unitario,
+        tipo_porção, status
+      FROM item_pedido
+      WHERE id_pedido = ?;
+    `;
+
+    return pedidos.map(pedido => {
+      const itens = db.prepare(itensQuery).all(pedido.id_pedido);
+      return { ...pedido, itens };
+    });
+
+  } catch (error) {
+    console.error(error);
+    throw new Error("Erro ao listar pedidos completos: " + error.message);
   }
 }

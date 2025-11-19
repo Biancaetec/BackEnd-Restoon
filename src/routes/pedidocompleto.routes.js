@@ -4,11 +4,14 @@ const router = express.Router();
 import { 
     criarPedidoCompleto,
     deletePedidoCompleto,
-    getPedidoCompleto
+    getPedidoCompleto,
+    listarPedidosCompleto
  } from "../controllers/pedidocompleto.controller.js";
 
+// Listar pedidos completos do restaurante
+router.get("/pedidocompleto", listarPedidosCompleto);
 // Rota para criar pedido + itens
-router.post("/pedido/completo", criarPedidoCompleto);
+router.post("/pedidocompleto", criarPedidoCompleto);
 // Buscar pedido completo (pedido + itens + pagamento)
 router.get('/pedidocompleto/:id_pedido', getPedidoCompleto);
 // Excluir pedido completo (pedido + itens + pagamento)
