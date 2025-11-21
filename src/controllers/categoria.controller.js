@@ -54,21 +54,32 @@ const categoriaSchema = z.object({
   id_restaurante: z.number().int().positive(),
 });
 
+// Listar categorias filtradas pelo restaurante logado
 export const getCategorias = async (req, res) => {
   try {
-    const categorias = await findAll();
+    const { id_restaurante } = req.query; // <<< aqui
+
+    if (!id_restaurante) {
+      return res.status(400).json({ message: "id_restaurante é obrigatório" });
+    }
+
+    const categorias = await findAll(id_restaurante);
     res.status(200).json(categorias);
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erro interno ao listar categorias" });
   }
 };
 
+// Criar categoria
 export const createCategoria = async (req, res) => {
+    console.log("Recebido no backend:", req.body);
+
   try {
     const categoriaData = categoriaSchema.parse(req.body);
     const novaCategoria = await create(categoriaData);
-    res.status(201).json({ message: "Categoria criada com sucesso"});
+    res.status(201).json({ message: "Categoria criada com sucesso", categoria: novaCategoria });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
@@ -76,11 +87,12 @@ export const createCategoria = async (req, res) => {
         errors: error.errors.map(e => ({ atributo: e.path[0], mensagem: e.message })),
       });
     }
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao criar categoria" });
+    console.error("[createCategoria] Erro:", error);
+    res.status(500).json({ message: "Erro interno ao criar categoria", detalhe: error.message });
   }
 };
 
+// Atualizar categoria
 export const updateCategoria = async (req, res) => {
   try {
     const { id_categoria } = req.params;
@@ -94,18 +106,19 @@ export const updateCategoria = async (req, res) => {
         errors: error.errors.map(e => ({ atributo: e.path[0], mensagem: e.message })),
       });
     }
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao atualizar categoria" });
+    console.error("[updateCategoria] Erro:", error);
+    res.status(500).json({ message: "Erro interno ao atualizar categoria", detalhe: error.message });
   }
 };
 
+// Deletar categoria
 export const deleteCategoria = async (req, res) => {
   try {
     const { id_categoria } = req.params;
     await remove(id_categoria);
     res.status(200).json({ message: `Categoria ${id_categoria} deletada com sucesso` });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: "Erro interno ao deletar categoria" });
+    console.error("[deleteCategoria] Erro:", error);
+    res.status(500).json({ message: "Erro interno ao deletar categoria", detalhe: error.message });
   }
 };

@@ -1,15 +1,29 @@
 import connectDB from '../../db/connection.js';
 
 // Buscar todas as categorias
-export async function findAll() {
+// export async function findAll() {
+//   try {
+//     const sqlQuery = "SELECT id_categoria, nome, id_restaurante FROM categoria;";
+//     const query = connectDB.prepare(sqlQuery);
+//     const result = await query.all();
+//     return result;
+//   } catch (error) {
+//     console.error(error);
+//     throw new Error("Erro ao buscar categorias: " + error.message);
+//   }
+// }
+export async function findAll(id_restaurante) {
   try {
-    const sqlQuery = "SELECT id_categoria, nome, id_restaurante FROM categoria;";
+    const sqlQuery = `
+      SELECT id_categoria, nome, id_restaurante
+      FROM categoria
+      WHERE id_restaurante = ?;
+    `;
     const query = connectDB.prepare(sqlQuery);
-    const result = await query.all();
-    return result;
+    return await query.all(id_restaurante);
   } catch (error) {
-    console.error(error);
-    throw new Error("Erro ao buscar categorias: " + error.message);
+    console.error('[CategoriaModel] Erro ao buscar categorias:', error);
+    throw new Error('Erro ao buscar categorias: ' + error.message);
   }
 }
 

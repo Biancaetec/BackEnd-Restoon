@@ -1,15 +1,16 @@
 import connectDB from '../../db/connection.js';
 
 // Buscar todos os produtos
-export async function findAll() {
+export async function findAll(id_restaurante) {
   try {
     const sqlQuery = `
-      SELECT id_produto, nome, descricao, preco, tipo_preparo, id_categoria, id_restaurante, ativo, imagem 
-      FROM produto;
+      SELECT id_produto, nome, descricao, preco, tipo_preparo, id_categoria, 
+             id_restaurante, ativo, imagem 
+      FROM produto
+      WHERE id_restaurante = ?;
     `;
     const query = connectDB.prepare(sqlQuery);
-    const result = await query.all();
-    return result;
+    return await query.all(id_restaurante);
   } catch (error) {
     console.error('[ProdutoModel] Erro ao buscar produtos:', error);
     throw new Error('Erro ao buscar produtos: ' + error.message);

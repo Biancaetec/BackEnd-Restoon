@@ -11,7 +11,7 @@ import {
 
 // Rotas de Produto
 router.post('/produto', createProduto);
-router.get('/produto', getProdutos);
+router.get('/produto:id_restaurante', getProdutos);
 router.patch('/produto/:id_produto', updateProduto);
 router.delete('/produto/:id_produto', deleteProduto);
 
