@@ -105,15 +105,15 @@ const produtoSchema = z.object({
   id_categoria: z.number().int().positive("Categoria inválida"),
   id_restaurante: z.number().int().positive("Restaurante inválido"),
 
-  // ACEITA APENAS O NOME DO ARQUIVO, NÃO URL COMPLETA
-  imagem: z.string().min(1, "Imagem inválida"),
+  // Permite null ou string com pelo menos 1 caractere
+  imagem: z.string().min(1, "Imagem inválida").nullable().optional(),
   
   ativo: z.union([z.literal(0), z.literal(1)], {
     errorMap: () => ({ message: "O campo ativo deve ser 0 ou 1" })
   }),
 });
 
-// 🔥 GET PRODUTOS (agora filtra por restaurante)
+// 🔥 GET PRODUTOS (filtra por restaurante)
 export const getProdutos = async (req, res) => {
   try {
     const { id_restaurante } = req.params;
@@ -122,20 +122,19 @@ export const getProdutos = async (req, res) => {
       return res.status(400).json({ message: "id_restaurante é obrigatório" });
     }
 
-    const produtos = await findAll(id_restaurante);
+    const produtos = await findAll(id_restaurante); // função no model
     res.status(200).json(produtos);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Erro interno ao listar produtos" });
   }
 };
+
 // 🔥 CREATE PRODUTO
 export const createProduto = async (req, res) => {
   try {
     const produtoData = produtoSchema.parse(req.body);
-
     await create(produtoData);
-
     res.status(201).json({ message: "Produto criado com sucesso" });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -165,16 +164,14 @@ export const updateProduto = async (req, res) => {
       tipo_preparo: req.body.tipo_preparo,
       id_categoria: Number(req.body.id_categoria),
       id_restaurante: Number(req.body.id_restaurante),
-      imagem: req.body.imagem,
+      imagem: req.body.imagem ?? null, // garante null se não vier
       ativo: req.body.ativo
     };
 
     await produtoSchema.partial().parseAsync(produtoData);
-
     await update(id_produto, produtoData);
 
     res.status(200).json({ message: "Produto atualizado com sucesso" });
-
   } catch (error) {
     if (error instanceof z.ZodError) {
       return res.status(400).json({
