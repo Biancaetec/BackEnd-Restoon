@@ -1,4 +1,4 @@
-import connectDB from '../../db/connection.js';
+import db from '../../db/connection.js';
 
 // Buscar todos os produtos
 export async function findAll(id_restaurante) {
@@ -9,8 +9,9 @@ export async function findAll(id_restaurante) {
       FROM produto
       WHERE id_restaurante = ?;
     `;
-    const query = connectDB.prepare(sqlQuery);
-    return await query.all(id_restaurante);
+    const query = db.prepare(sqlQuery);
+    return query.all(id_restaurante);
+
   } catch (error) {
     console.error('[ProdutoModel] Erro ao buscar produtos:', error);
     throw new Error('Erro ao buscar produtos: ' + error.message);
@@ -25,9 +26,10 @@ export async function create(produtoData) {
       (nome, descricao, preco, tipo_preparo, id_categoria, id_restaurante, ativo, imagem) 
       VALUES (?, ?, ?, ?, ?, ?, ?, ?);
     `;
-    const insert = connectDB.prepare(query);
 
-    const result = await insert.run(
+    const insert = db.prepare(query);
+
+    const result = insert.run(
       produtoData.nome ?? '',
       produtoData.descricao ?? '',
       Number(produtoData.preco) || 0,
@@ -38,9 +40,9 @@ export async function create(produtoData) {
       produtoData.imagem ?? null
     );
 
-    const novoProdutoQuery = connectDB.prepare('SELECT * FROM produto WHERE id_produto = ?');
-    const novoProduto = await novoProdutoQuery.get(result.lastInsertRowid);
-    return novoProduto;
+    const novoProdutoQuery = db.prepare('SELECT * FROM produto WHERE id_produto = ?');
+    return novoProdutoQuery.get(result.lastInsertRowid);
+
   } catch (error) {
     console.error('[ProdutoModel] Erro ao criar produto:', error);
     throw new Error('Erro ao criar produto: ' + error.message);
@@ -50,24 +52,12 @@ export async function create(produtoData) {
 // Atualizar produto existente
 export async function update(id_produto, produtoData) {
   console.log('Model Produto:', produtoData);
+
   try {
     if (!id_produto) {
       throw new Error('ID do produto não fornecido.');
     }
 
-    // const query = `
-    //   UPDATE produto 
-    //   SET 
-    //     nome = ?, 
-    //     descricao = ?, 
-    //     preco = ?, 
-    //     tipo_preparo = ?, 
-    //     id_categoria = ?, 
-    //     id_restaurante = ?, 
-    //     ativo = ?, 
-    //     imagem = ?
-    //   WHERE id_produto = ?;
-    // `;
     const query = `
       UPDATE produto 
       SET 
@@ -80,9 +70,9 @@ export async function update(id_produto, produtoData) {
       WHERE id_produto = ?;
     `;
 
-    const update = connectDB.prepare(query);
+    const update = db.prepare(query);
 
-    const result = await update.run(
+    const result = update.run(
       produtoData.nome,
       produtoData.descricao,
       Number(produtoData.preco),
@@ -97,6 +87,7 @@ export async function update(id_produto, produtoData) {
     }
 
     return result;
+
   } catch (error) {
     console.error('[ProdutoModel] Erro ao atualizar produto:', error);
     throw new Error('Erro ao atualizar produto: ' + error.message);
@@ -107,14 +98,16 @@ export async function update(id_produto, produtoData) {
 export async function remove(id_produto) {
   try {
     const query = 'DELETE FROM produto WHERE id_produto = ?;';
-    const remove = connectDB.prepare(query);
-    const result = await remove.run(id_produto);
+    const remove = db.prepare(query);
+
+    const result = remove.run(id_produto);
 
     if (result.changes === 0) {
       throw new Error('Produto não encontrado');
     }
 
     return result;
+
   } catch (error) {
     console.error('[ProdutoModel] Erro ao deletar produto:', error);
     throw new Error('Erro ao deletar produto: ' + error.message);
