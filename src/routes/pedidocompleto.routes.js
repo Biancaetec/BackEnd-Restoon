@@ -9,7 +9,8 @@ import {
     atualizarStatusPedido,
     limparPedidosMesa,
     getFilaPreparoPorCategoria,
-    atualizarStatusItemPedido
+    atualizarStatusItemPedido,
+    getItensFinalizados
  } from "../controllers/pedidocompleto.controller.js";
 
 // Listar pedidos completos do restaurante
@@ -28,7 +29,7 @@ router.delete("/pedidocompleto/mesa/:id_mesa", limparPedidosMesa);
 router.get("/fila-preparo/:id_categoria", getFilaPreparoPorCategoria);
 // Atualizar status de um item do pedido
 router.patch("/itempedido/status/:id_item", atualizarStatusItemPedido);
-
-
+// Itens finalizados
+router.get("/pedidocompleto/finalizados", getItensFinalizados);
 
 export default router;

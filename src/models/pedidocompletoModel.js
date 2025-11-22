@@ -251,15 +251,18 @@ export function findFilaByCategoria(id_categoria) {
         c.nome AS nome_categoria,
 
         ped.id_mesa,
-        ped.observacoes
+        m.numero AS numero_mesa,     -- AQUI 🔥
+        ped.observacoes,
 
+        ped.data_abertura            -- útil pra mostrar tempo decorrido
       FROM item_pedido ip
       INNER JOIN produto p ON p.id_produto = ip.id_produto
       INNER JOIN categoria c ON c.id_categoria = p.id_categoria
       INNER JOIN pedido ped ON ped.id_pedido = ip.id_pedido
+      LEFT JOIN mesa m ON m.id_mesa = ped.id_mesa   -- AQUI 🔥
 
       WHERE c.id_categoria = ?
-      AND ip.status IN ('aguardando', 'em_preparo')
+      AND ip.status IN ('aguardando', 'em_preparo', 'pronto')
 
       ORDER BY ped.data_abertura ASC;
     `;
@@ -271,6 +274,7 @@ export function findFilaByCategoria(id_categoria) {
     throw new Error("Erro ao obter fila de preparo: " + error.message);
   }
 }
+
 
 /* ===========================================================
    Atualizar status de UM item do pedido
@@ -315,3 +319,28 @@ export function updateStatusItemPedido(id_item, novoStatus) {
   }
 }
 
+export function findItensFinalizados() {
+  try {
+    const query = `
+      SELECT 
+        ip.id_item,
+        ip.id_pedido,
+        ip.id_produto,
+        ip.quantidade,
+        ip.status,
+        p.nome AS nome_produto,
+        ped.id_mesa,
+        m.numero AS numero_mesa
+      FROM item_pedido ip
+      INNER JOIN pedido ped ON ped.id_pedido = ip.id_pedido
+      INNER JOIN produto p ON p.id_produto = ip.id_produto
+      LEFT JOIN mesa m ON m.id_mesa = ped.id_mesa
+      WHERE ip.status IN ('pronto', 'entregue', 'fechado')
+      ORDER BY ped.data_abertura DESC
+    `;
+    return db.prepare(query).all();
+  } catch (err) {
+    console.error(err);
+    throw new Error("Erro ao buscar itens finalizados: " + err.message);
+  }
+}

@@ -6,7 +6,9 @@ import {
   findByRestaurante,
   updateStatusPedido,
   removePedidosPorMesa,
-  updateStatusItemPedido
+  updateStatusItemPedido,
+  findFilaByCategoria,
+  findItensFinalizados
 } from "../models/pedidocompletoModel.js";
 
 // -----------------------------
@@ -202,9 +204,7 @@ export const limparPedidosMesa = async (req, res) => {
   }
 };
 
-import { findFilaByCategoria } from "../models/pedidocompletoModel.js";
-
-export const getFilaPreparoPorCategoria = (req, res) => {
+export const getFilaPreparoPorCategoria = async (req, res) => {
   try {
     const { id_categoria } = req.params;
 
@@ -260,3 +260,20 @@ export const atualizarStatusItemPedido = async (req, res) => {
   }
 };
 
+// =======================================================
+// Listar itens finalizados
+// =======================================================
+export const getItensFinalizados = async (req, res) => {
+  try {
+    const itens = await findItensFinalizados(); // pega todos os itens com status finalizado
+
+    return res.status(200).json(itens);
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Erro interno ao buscar itens finalizados",
+      error: error.message
+    });
+  }
+};

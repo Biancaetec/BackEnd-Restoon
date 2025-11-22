@@ -49,7 +49,6 @@ export async function create(produtoData) {
   }
 }
 
-// Atualizar produto existente
 export async function update(id_produto, produtoData) {
   console.log('Model Produto:', produtoData);
 
@@ -66,7 +65,8 @@ export async function update(id_produto, produtoData) {
         preco = ?, 
         tipo_preparo = ?,
         id_categoria = ?, 
-        id_restaurante = ? 
+        id_restaurante = ?,
+        imagem = ?
       WHERE id_produto = ?;
     `;
 
@@ -79,6 +79,7 @@ export async function update(id_produto, produtoData) {
       produtoData.tipo_preparo,
       produtoData.id_categoria,
       produtoData.id_restaurante,
+      produtoData.imagem ?? null,
       id_produto
     );
 
@@ -93,6 +94,7 @@ export async function update(id_produto, produtoData) {
     throw new Error('Erro ao atualizar produto: ' + error.message);
   }
 }
+
 
 // Remover produto
 export async function remove(id_produto) {
