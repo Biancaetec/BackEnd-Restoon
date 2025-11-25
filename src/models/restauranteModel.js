@@ -107,3 +107,18 @@ export async function findByEmailAndSenha(email, senha) {
     throw new Error("Erro ao buscar restaurante");
   }
 }
+
+// Buscar restaurante por ID
+export async function findById(id_restaurante) {
+  try {
+    const query = `
+      SELECT id_restaurante, id_usuario, nome, email, criado_em, status_licenciamento
+      FROM restaurante
+      WHERE id_restaurante = ?;
+    `;
+    return db.prepare(query).get(id_restaurante);
+  } catch (error) {
+    console.error(error);
+    throw new Error("Erro ao buscar restaurante por ID: " + error.message);
+  }
+}

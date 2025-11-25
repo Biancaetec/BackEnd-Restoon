@@ -4,7 +4,8 @@ import {
     remove,
     update,
     updateStatus,
-    findByEmailAndSenha
+    findByEmailAndSenha,
+    findById
 } from "../models/restauranteModel.js";
 
 import { z } from "zod";
@@ -170,4 +171,23 @@ export const updateRestauranteStatus = async (req, res) => {
             error: error.errors ?? error.message,
         });
     }
+};
+
+
+export const getRestauranteById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const restaurante = await findById(id);
+
+    if (!restaurante) {
+      return res.status(404).json({ message: "Restaurante não encontrado" });
+    }
+
+    return res.status(200).json(restaurante);
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Erro ao buscar restaurante" });
+  }
 };
