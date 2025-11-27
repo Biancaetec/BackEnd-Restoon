@@ -11,9 +11,7 @@ import {
   findItensFinalizados
 } from "../models/pedidocompletoModel.js";
 
-// -----------------------------
-// ZOD para validar entrada
-// -----------------------------
+
 const pedidoCompletoSchema = z.object({
   id_mesa: z.number().int().positive(),
   id_usuario: z.number().int().positive(),
@@ -33,10 +31,6 @@ const pedidoCompletoSchema = z.object({
   ).min(1, "O pedido deve conter ao menos 1 item."),
 });
 
-
-// =======================================================
-// Criar pedido completo
-// =======================================================
 export const criarPedidoCompleto = async (req, res) => {
   try {
     const pedidoData = pedidoCompletoSchema.parse(req.body);

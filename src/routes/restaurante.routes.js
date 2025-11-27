@@ -5,7 +5,6 @@ import {
   updateRestaurante,
   deleteRestaurante,
   updateRestauranteStatus,
-  getRestauranteById
 } from '../controllers/restaurante.controller.js';
 
 const router = express.Router();
@@ -28,7 +27,6 @@ router.patch('/restaurante/:id/status', updateRestauranteStatus);
 // Deletar restaurante
 router.delete('/restaurante/:id', deleteRestaurante);
 
-router.get('/restaurante/:id', getRestauranteById);
 
 export default router;
 

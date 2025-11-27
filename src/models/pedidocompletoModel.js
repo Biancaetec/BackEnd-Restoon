@@ -1,11 +1,9 @@
 import db from '../../db/connection.js';
 
-/* ===========================================================
-   Buscar pedido completo por ID
-=========================================================== */
+
 export function findById(id_pedido) {
   try {
-    // Buscar pedido
+
     const pedidoQuery = `
       SELECT 
         id_pedido, id_mesa, id_usuario, status, tipo_preparo,
@@ -17,7 +15,7 @@ export function findById(id_pedido) {
 
     if (!pedido) return null;
 
-    // Buscar itens
+
     const itensQuery = `
   SELECT 
     ip.id_item,
@@ -47,9 +45,7 @@ export function findById(id_pedido) {
   }
 }
 
-/* ===========================================================
-   Criar pedido + itens (transação)
-=========================================================== */
+
 export function createPedidoCompleto(data) {
   try {
     db.exec("BEGIN TRANSACTION;");
@@ -105,9 +101,7 @@ export function createPedidoCompleto(data) {
   }
 }
 
-/* ===========================================================
-   Remover pedido completo
-=========================================================== */
+
 export function removePedidoCompleto(id_pedido) {
   try {
     db.exec("BEGIN TRANSACTION;");
@@ -132,9 +126,7 @@ export function removePedidoCompleto(id_pedido) {
   }
 }
 
-/* ===========================================================
-   Listar todos os pedidos completos de um restaurante
-=========================================================== */
+
 export function findByRestaurante(id_restaurante) {
   try {
     const pedidosQuery = `
@@ -180,9 +172,6 @@ export function findByRestaurante(id_restaurante) {
   }
 }
 
-/* ===========================================================
-   Atualizar status
-=========================================================== */
 export function updateStatusPedido(id_pedido, novoStatus) {
   try {
     const stmt = db.prepare(`
@@ -204,21 +193,18 @@ export function updateStatusPedido(id_pedido, novoStatus) {
     throw new Error("Erro ao atualizar status do pedido: " + error.message);
   }
 }
-/* ===========================================================
-   Remover todos os pedidos de uma mesa
-=========================================================== */
+
 export function removePedidosPorMesa(id_mesa) {
   try {
     db.exec("BEGIN TRANSACTION;");
 
-    // Buscar pedidos da mesa
     const pedidos = db.prepare("SELECT id_pedido FROM pedido WHERE id_mesa = ?;").all(id_mesa);
 
     const deleteItem = db.prepare("DELETE FROM item_pedido WHERE id_pedido = ?;");
 
     pedidos.forEach(p => deleteItem.run(p.id_pedido));
 
-    // Deletar os pedidos
+ 
     db.prepare("DELETE FROM pedido WHERE id_mesa = ?;").run(id_mesa);
 
     db.exec("COMMIT;");
@@ -232,9 +218,7 @@ export function removePedidosPorMesa(id_mesa) {
   }
 }
 
-/* ===========================================================
-   Fila de preparo por categoria
-=========================================================== */
+
 export function findFilaByCategoria(id_categoria) {
   try {
     const query = `
@@ -251,15 +235,15 @@ export function findFilaByCategoria(id_categoria) {
         c.nome AS nome_categoria,
 
         ped.id_mesa,
-        m.numero AS numero_mesa,     -- AQUI 🔥
+        m.numero AS numero_mesa,     
         ped.observacoes,
 
-        ped.data_abertura            -- útil pra mostrar tempo decorrido
+        ped.data_abertura           
       FROM item_pedido ip
       INNER JOIN produto p ON p.id_produto = ip.id_produto
       INNER JOIN categoria c ON c.id_categoria = p.id_categoria
       INNER JOIN pedido ped ON ped.id_pedido = ip.id_pedido
-      LEFT JOIN mesa m ON m.id_mesa = ped.id_mesa   -- AQUI 🔥
+      LEFT JOIN mesa m ON m.id_mesa = ped.id_mesa   
 
       WHERE c.id_categoria = ?
       AND ip.status IN ('aguardando', 'em_preparo', 'pronto')
@@ -276,9 +260,7 @@ export function findFilaByCategoria(id_categoria) {
 }
 
 
-/* ===========================================================
-   Atualizar status de UM item do pedido
-=========================================================== */
+
 export function updateStatusItemPedido(id_item, novoStatus) {
   try {
     const stmt = db.prepare(`
@@ -293,7 +275,7 @@ export function updateStatusItemPedido(id_item, novoStatus) {
       throw new Error("Item não encontrado");
     }
 
-    // Retornar o item atualizado
+    
     const itemAtualizado = db.prepare(`
       SELECT 
         ip.id_item,

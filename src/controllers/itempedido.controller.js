@@ -14,7 +14,9 @@ const itemPedidoSchema = z.object({
 // Criar item de pedido no banco
 export const createItemPedido = async (req, res) => {
   try {
-    const itemData = itemPedidoSchema.parse(req.body);
+
+    const itemData = itemPedidoSchema.parse(req.body);   
+
     const result = await create(itemData); // usar o model real
     res.status(201).json({ message: "Item de pedido criado com sucesso" });
   } catch (error) {
